@@ -24,4 +24,4 @@ PhpAfipWs es una pequeña librería que permite que cualquier sistema en PHP pue
 
 > **Requires [PHP 8.0+](https://php.net/releases/)**
 
-**PhpAfipWs** was created by **[Armando Lazarte](https://x.com/enunomaduro)** under the **[MIT license](https://opensource.org/licenses/MIT)**.
+**PhpAfipWs** fue creado por **[Armando Lazarte](https://x.com/ArmandoLazarte)** bajo la **[licencia MIT](https://opensource.org/licenses/MIT)**.
