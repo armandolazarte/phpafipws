@@ -50,12 +50,12 @@ class PadronConstanciaInscripcion extends AfipWebService
     /**
      * Obtiene los datos de multiples contribuyentes a partir de sus CUIT.
      *
-     * @param  array<int>  $identifiers  Array de CUIT de los contribuyentes a consultar.
+     * @param  array<int>  $identificadores  Array de CUIT de los contribuyentes a consultar.
      * @return mixed La respuesta del servidor con los datos de los contribuyentes.
      *
      * @throws AfipException Si ocurre un error al obtener el TA o en la comunicación SOAP.
      */
-    public function getTaxpayersDetails(array $identifiers): mixed
+    public function getDatosContribuyentes(array $identificadores): mixed
     {
         $tokenAutorizacion = $this->getTokenAutorizacion();
 
@@ -63,7 +63,7 @@ class PadronConstanciaInscripcion extends AfipWebService
             'token' => $tokenAutorizacion->getToken(),
             'sign' => $tokenAutorizacion->getSign(),
             'cuitRepresentada' => $this->afip->getCuit(),
-            'idPersona' => $identifiers,
+            'idPersona' => $identificadores,
         ];
 
         return $this->ejecutar('getPersonaList_v2', $parametros);
