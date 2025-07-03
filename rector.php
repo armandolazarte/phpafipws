@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use Rector\Config\RectorConfig;
+use Rector\Naming\Rector\Assign\RenameVariableToMatchMethodCallReturnTypeRector;
+use Rector\Naming\Rector\Class_\RenamePropertyToMatchTypeRector;
+use Rector\Naming\Rector\ClassMethod\RenameVariableToMatchNewTypeRector;
+use Rector\Naming\Rector\Foreach_\RenameForeachValueVariableToMatchExprVariableRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 
 return RectorConfig::configure()
@@ -13,6 +17,10 @@ return RectorConfig::configure()
     ])
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        RenameVariableToMatchNewTypeRector::class,
+        RenameVariableToMatchMethodCallReturnTypeRector::class,
+        RenamePropertyToMatchTypeRector::class,
+        RenameForeachValueVariableToMatchExprVariableRector::class,
     ])
     ->withPreparedSets(
         deadCode: true,
