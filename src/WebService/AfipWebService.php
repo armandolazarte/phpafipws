@@ -7,6 +7,7 @@ namespace PhpAfipWs\WebService;
 use PhpAfipWs\Afip;
 use PhpAfipWs\Auth\TokenAuthorization;
 use PhpAfipWs\Exception\AfipException;
+use PhpAfipWs\WebService\Contracts\AfipWebServiceInterface;
 use SoapClient;
 use SoapFault;
 
@@ -17,7 +18,7 @@ use SoapFault;
  * incluyendo la gestión del cliente SOAP, la obtención de la autorización de token
  * y el manejo de errores.
  */
-class AfipWebService
+class AfipWebService implements AfipWebServiceInterface
 {
     /**
      * Versión de SOAP a utilizar. Por defecto, SOAP_1_2.
@@ -65,7 +66,7 @@ class AfipWebService
     /**
      * Obtiene el Token de Autorización (TA) para el Web Service actual desde el WSAA.
      *
-     * Utiliza la instancia de `Arca` para gestionar la obtención o renovación del TA.
+     * Utiliza la instancia de `Afip` para gestionar la obtención o renovación del TA.
      *
      * @return TokenAuthorization El objeto TokenAuthorization que contiene el token y la firma.
      *
@@ -112,7 +113,7 @@ class AfipWebService
      *
      * @return string El nombre del servicio.
      */
-    protected function getNombreServicio(): string
+    public function getNombreServicio(): string
     {
         return (string) ($this->opciones['service'] ?? 'ws_sr_padron_a5');
     }
@@ -130,11 +131,11 @@ class AfipWebService
         }
 
         if ($this->nombreWsdl === null) {
-            throw new AfipException('La ruta del WSDL es nula después de la inicialización. Esto no debería ocurrir.', 3); // TODO: Revisar código de error
+            throw new AfipException('La ruta del WSDL es nula después de la inicialización. Esto no debería ocurrir.', 3);
         }
 
         if (! file_exists($this->nombreWsdl)) {
-            throw new AfipException('No se pudo abrir el archivo WSDL: '.$this->nombreWsdl, 3); // TODO: Revisar código de error
+            throw new AfipException('No se pudo abrir el archivo WSDL: '.$this->nombreWsdl, 3);
         }
     }
 
@@ -149,7 +150,7 @@ class AfipWebService
 
         foreach ($opcionesRequeridas as $opcionRequerida) {
             if (! isset($this->opciones[$opcionRequerida])) {
-                throw new AfipException(sprintf('El campo %s es requerido en las opciones para un web service genérico', $opcionRequerida)); // TODO: Revisar código de error
+                throw new AfipException(sprintf('El campo %s es requerido en las opciones para un web service genérico', $opcionRequerida));
             }
         }
 
@@ -178,11 +179,11 @@ class AfipWebService
         $urlEndpoint = $this->afip->esProduccion() ? $this->urlProduccion : $this->urlPrueba;
 
         if ($nombreArchivoWsdl === null) {
-            throw new AfipException('El nombre de archivo WSDL no está definido para este servicio web. Verifique las propiedades de la clase hija.', 3); // TODO: Revisar código de error
+            throw new AfipException('El nombre de archivo WSDL no está definido para este servicio web. Verifique las propiedades de la clase hija.', 3);
         }
 
         if ($urlEndpoint === null) {
-            throw new AfipException('La URL del endpoint no está definida para este servicio web. Verifique las propiedades de la clase hija.', 3); // TODO: Revisar código de error
+            throw new AfipException('La URL del endpoint no está definida para este servicio web. Verifique las propiedades de la clase hija.', 3);
         }
 
         $this->nombreWsdl = __DIR__.'/../Resources/'.$nombreArchivoWsdl;
@@ -199,14 +200,14 @@ class AfipWebService
     private function crearClienteSoap(): void
     {
         if ($this->nombreWsdl === null || $this->urlProduccion === null) {
-            throw new AfipException('WSDL o URL no están configurados para la inicialización de SoapClient.', 3); // TODO: Revisar código de error
+            throw new AfipException('WSDL o URL no están configurados para la inicialización de SoapClient.', 3);
         }
 
         $this->clienteSoap = new SoapClient($this->nombreWsdl, [
             'soap_version' => $this->versionSoap,
             'location' => $this->urlProduccion,
             'trace' => 1,
-            'exceptions' => $this->afip->opciones['manejar_excepciones_soap'] ?? false, // TODO: Revisar si se puede acceder directamente
+            'exceptions' => $this->afip->getManejarExcepcionesSoap(),
             'stream_context' => stream_context_create([
                 'ssl' => [
                     'ciphers' => 'AES256-SHA',

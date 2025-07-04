@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace PhpAfipWs\WebService;
 
 use PhpAfipWs\Exception\AfipException;
+use PhpAfipWs\WebService\Contracts\PadronAlcanceTreceInterface;
 
 /**
  * Clase para interactuar con el Web Service de Padrón Alcance 13 de AFIP (ws_sr_padron_a13).
  *
  * Permite consultar los datos de un contribuyente a partir de su CUIT o buscar un CUIT a partir de un número de documento.
  */
-class PadronAlcanceTrece extends AfipWebService
+class PadronAlcanceTrece extends AfipWebService implements PadronAlcanceTreceInterface
 {
     /** {@inheritdoc} */ // Nombre del archivo WSDL para el entorno de producción.
     protected ?string $nombreWsdl = 'ws_sr_padron_a13-production.wsdl';
@@ -82,7 +83,7 @@ class PadronAlcanceTrece extends AfipWebService
     }
 
     /** {@inheritdoc} */
-    protected function getNombreServicio(): string
+    public function getNombreServicio(): string
     {
         return 'ws_sr_padron_a13';
     }

@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace PhpAfipWs\WebService;
 
 use PhpAfipWs\Exception\AfipException;
+use PhpAfipWs\WebService\Contracts\PadronConstanciaInscripcionInterface;
 
 /**
  * Clase para interactuar con el Web Service de Constancia de Inscripción de AFIP (ws_sr_constancia_inscripcion).
  *
  * Permite consultar los datos de un contribuyente a partir de su CUIT.
  */
-class PadronConstanciaInscripcion extends AfipWebService
+class PadronConstanciaInscripcion extends AfipWebService implements PadronConstanciaInscripcionInterface
 {
     /** {@inheritdoc} */
     protected ?string $nombreWsdl = 'ws_sr_constancia_inscripcion-production.wsdl';
@@ -28,7 +29,7 @@ class PadronConstanciaInscripcion extends AfipWebService
     /**
      * Consulta y obtiene los datos de un contribuyente registrados en AFIP.
      *
-     * @param  int  $identifier  El CUIT del contribuyente a consultar.
+     * @param  int  $identificador  El CUIT del contribuyente a consultar.
      * @return mixed La respuesta del servidor con los datos del contribuyente.
      *
      * @throws AfipException Si ocurre un error al obtener el TA o en la comunicación SOAP.
@@ -82,7 +83,7 @@ class PadronConstanciaInscripcion extends AfipWebService
     }
 
     /** {@inheritdoc} */
-    protected function getNombreServicio(): string
+    public function getNombreServicio(): string
     {
         return 'ws_sr_constancia_inscripcion';
     }

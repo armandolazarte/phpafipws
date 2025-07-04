@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace PhpAfipWs\WebService;
 
 use PhpAfipWs\Exception\AfipException;
+use PhpAfipWs\WebService\Contracts\FacturacionElectronicaInterface;
 
 /**
  * Clase para interactuar con el Web Service de Facturación Electrónica de AFIP (wsfe).
@@ -12,7 +13,7 @@ use PhpAfipWs\Exception\AfipException;
  * Permite realizar operaciones como verificar el estado del servidor, obtener el último
  * número de comprobante, autorizar comprobantes y consultar datos de parámetros.
  */
-class FacturacionElectronica extends AfipWebService
+class FacturacionElectronica extends AfipWebService implements FacturacionElectronicaInterface
 {
     /** {@inheritdoc} */
     protected ?string $nombreWsdl = 'wsfe-production.wsdl';
@@ -170,7 +171,7 @@ class FacturacionElectronica extends AfipWebService
      *
      * Devuelve el nombre del servicio para la autorización del token.
      */
-    protected function getNombreServicio(): string
+    public function getNombreServicio(): string
     {
         return 'wsfe';
     }

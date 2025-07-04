@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace PhpAfipWs\WebService;
 
 use PhpAfipWs\Exception\AfipException;
+use PhpAfipWs\WebService\Contracts\PadronAlcanceCincoInterface;
 
 /**
  * Clase para interactuar con el Web Service de Padrón Alcance 5 de AFIP (ws_sr_padron_a5).
  *
  * Permite consultar los datos de una persona (física o jurídica) a partir de su CUIT/CUIL.
  */
-class PadronAlcanceCinco extends AfipWebService
+class PadronAlcanceCinco extends AfipWebService implements PadronAlcanceCincoInterface
 {
     /** {@inheritdoc} */
     protected ?string $nombreWsdl = 'ws_sr_padron_a5-production.wsdl';
@@ -74,7 +75,7 @@ class PadronAlcanceCinco extends AfipWebService
      *
      * Devuelve el nombre del servicio para la autorización del token.
      */
-    protected function getNombreServicio(): string
+    public function getNombreServicio(): string
     {
         return 'ws_sr_padron_a5';
     }
