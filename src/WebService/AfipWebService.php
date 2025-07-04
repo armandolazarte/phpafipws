@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace PhpAfipWs\WebService;
 
+use Exception;
 use PhpAfipWs\Afip;
 use PhpAfipWs\Auth\TokenAuthorization;
-use PhpAfipWs\Exception\AfipException;
+use PhpAfipWs\Exception\AuthException;
+use PhpAfipWs\Exception\ConfigurationException;
+use PhpAfipWs\Exception\ErrorCodes; // <--- Nuevo use
+use PhpAfipWs\Exception\WebServiceException;
 use PhpAfipWs\WebService\Contracts\AfipWebServiceInterface;
 use SoapClient;
 use SoapFault;
@@ -70,7 +74,8 @@ class AfipWebService implements AfipWebServiceInterface
      *
      * @return TokenAuthorization El objeto TokenAuthorization que contiene el token y la firma.
      *
-     * @throws AfipException Si ocurre un error al obtener o crear el Token de Autorización (TA).
+     * @throws AuthException Si ocurre un error al obtener o crear el Token de Autorización (TA).
+     * @throws ConfigurationException Si hay problemas con rutas de archivo o permisos.
      */
     public function getTokenAutorizacion(): TokenAuthorization
     {
@@ -89,19 +94,44 @@ class AfipWebService implements AfipWebServiceInterface
      * @param  array<string, mixed>  $parametros  Los parámetros a enviar en la solicitud.
      * @return mixed Los resultados de la operación.
      *
-     * @throws AfipException Si ocurre un error en la solicitud SOAP o en la respuesta de AFIP.
+     * @throws WebServiceException Si ocurre un error en la solicitud SOAP o en la respuesta de AFIP.
+     * @throws ConfigurationException Si el cliente SOAP no puede ser inicializado.
      */
     public function ejecutar(string $operacion, array $parametros = []): mixed
     {
-        if (! $this->clienteSoap instanceof SoapClient) {
-            $this->crearClienteSoap();
+        try {
+            if (! $this->clienteSoap instanceof SoapClient) {
+                $this->crearClienteSoap();
+            }
+
+            $resultados = $this->clienteSoap->{$operacion}($parametros);
+
+            $this->verificarErrores($operacion, $resultados);
+
+            return $resultados;
+        } catch (SoapFault $e) {
+            // Si $this->afip->getManejarExcepcionesSoap() es true, SoapClient lanzará SoapFault
+            throw new WebServiceException(
+                sprintf('Error de comunicación SOAP al ejecutar "%s": %s', $operacion, $e->getMessage()),
+                ErrorCodes::WEB_SERVICE_SOAP_FAULT,
+                $e->faultcode,
+                $e
+            );
+        } catch (WebServiceException $e) {
+            // Re-lanzar excepciones ya encapsuladas desde verificarErrores()
+            throw $e;
+        } catch (ConfigurationException $e) {
+            // Re-lanzar excepciones de configuración
+            throw $e;
+        } catch (Exception $e) {
+            // Capturar cualquier otra excepción inesperada
+            throw new WebServiceException(
+                sprintf('Error inesperado al ejecutar "%s": %s', $operacion, $e->getMessage()),
+                ErrorCodes::WEB_SERVICE_UNKNOWN_ERROR,
+                null,
+                $e
+            );
         }
-
-        $resultados = $this->clienteSoap->{$operacion}($parametros);
-
-        $this->verificarErrores($operacion, $resultados);
-
-        return $resultados;
     }
 
     /**
@@ -121,6 +151,8 @@ class AfipWebService implements AfipWebServiceInterface
     /**
      * Inicializa la configuración del Web Service (WSDL y URL)
      * basándose en si es un servicio genérico o específico y el entorno (producción/testing).
+     *
+     * @throws ConfigurationException Si las rutas del WSDL no son válidas.
      */
     private function inicializarWebService(): void
     {
@@ -130,12 +162,13 @@ class AfipWebService implements AfipWebServiceInterface
             $this->inicializarWebServiceEspecifico();
         }
 
+        // Asegurarse de que el WSDL existe y es legible después de la inicialización
         if ($this->nombreWsdl === null) {
-            throw new AfipException('La ruta del WSDL es nula después de la inicialización. Esto no debería ocurrir.', 3);
+            throw new ConfigurationException('La ruta del WSDL es nula después de la inicialización. Esto no debería ocurrir.', ErrorCodes::CONFIG_INVALID_WSDL_PATH);
         }
 
         if (! file_exists($this->nombreWsdl)) {
-            throw new AfipException('No se pudo abrir el archivo WSDL: '.$this->nombreWsdl, 3);
+            throw new ConfigurationException('No se pudo abrir el archivo WSDL: '.$this->nombreWsdl.'. Verifique la ruta y permisos.', ErrorCodes::CONFIG_FILE_NOT_FOUND);
         }
     }
 
@@ -143,6 +176,8 @@ class AfipWebService implements AfipWebServiceInterface
      * Inicializa las propiedades WSDL y URL para un Web Service genérico.
      *
      * Requiere que se pasen opciones específicas como 'WSDL', 'URL', 'WSDL_PRUEBA', 'URL_PRUEBA' y 'service'.
+     *
+     * @throws ConfigurationException Si faltan opciones requeridas.
      */
     private function inicializarWebServiceGenerico(): void
     {
@@ -150,19 +185,32 @@ class AfipWebService implements AfipWebServiceInterface
 
         foreach ($opcionesRequeridas as $opcionRequerida) {
             if (! isset($this->opciones[$opcionRequerida])) {
-                throw new AfipException(sprintf('El campo %s es requerido en las opciones para un web service genérico', $opcionRequerida));
+                throw new ConfigurationException(
+                    sprintf('El campo %s es requerido en las opciones para un web service genérico', $opcionRequerida),
+                    ErrorCodes::CONFIG_MISSING_GENERIC_SERVICE_OPTION
+                );
             }
         }
 
+        $baseWsdlPath = __DIR__.'/../Resources/'; // Asumiendo que WSDLs genéricos también están en Resources
+
         if ($this->afip->esProduccion()) {
-            $this->nombreWsdl = (string) ($this->opciones['WSDL']);
+            $this->nombreWsdl = $baseWsdlPath.$this->opciones['WSDL']; // Concatena con base path
             $this->urlProduccion = (string) ($this->opciones['URL']);
         } else {
-            $this->nombreWsdl = (string) ($this->opciones['WSDL_PRUEBA']);
+            $this->nombreWsdl = $baseWsdlPath.$this->opciones['WSDL_PRUEBA']; // Concatena con base path
             $this->urlProduccion = (string) ($this->opciones['URL_PRUEBA']);
         }
 
         $this->versionSoap = (int) ($this->opciones['soap_version'] ?? SOAP_1_2);
+
+        // Validar que el WSDL genérico existe en la ruta construida
+        if (! file_exists($this->nombreWsdl)) {
+            throw new ConfigurationException(
+                sprintf('El WSDL genérico especificado no se encontró en: %s. Verifique la opción "WSDL" o "WSDL_PRUEBA".', $this->nombreWsdl),
+                ErrorCodes::CONFIG_FILE_NOT_FOUND
+            );
+        }
     }
 
     /**
@@ -171,22 +219,23 @@ class AfipWebService implements AfipWebServiceInterface
      * Utiliza las propiedades protegidas `$nombreWsdl`, `$urlProduccion`, `$nombreWsdlPrueba` y `$urlPrueba` definidas en la clase hija.
      * Asegura que estas propiedades (que son los nombres de archivo/URL base) no sean nulas.
      *
-     * @throws AfipException Si el nombre de archivo WSDL o la URL del endpoint no están definidos en la clase hija.
+     * @throws ConfigurationException Si el nombre de archivo WSDL o la URL del endpoint no están definidos en la clase hija.
      */
     private function inicializarWebServiceEspecifico(): void
     {
-        $nombreArchivoWsdl = $this->afip->esProduccion() ? $this->nombreWsdl : $this->nombreWsdlPrueba;
+        $nombreArchivoWsdlBase = $this->afip->esProduccion() ? $this->nombreWsdl : $this->nombreWsdlPrueba;
         $urlEndpoint = $this->afip->esProduccion() ? $this->urlProduccion : $this->urlPrueba;
 
-        if ($nombreArchivoWsdl === null) {
-            throw new AfipException('El nombre de archivo WSDL no está definido para este servicio web. Verifique las propiedades de la clase hija.', 3);
+        if ($nombreArchivoWsdlBase === null) {
+            throw new ConfigurationException('El nombre de archivo WSDL no está definido para este servicio web. Verifique las propiedades de la clase hija.', ErrorCodes::CONFIG_MISSING_SPECIFIC_SERVICE_DEFINITION);
         }
 
         if ($urlEndpoint === null) {
-            throw new AfipException('La URL del endpoint no está definida para este servicio web. Verifique las propiedades de la clase hija.', 3);
+            throw new ConfigurationException('La URL del endpoint no está definida para este servicio web. Verifique las propiedades de la clase hija.', ErrorCodes::CONFIG_MISSING_SPECIFIC_SERVICE_DEFINITION);
         }
 
-        $this->nombreWsdl = __DIR__.'/../Resources/'.$nombreArchivoWsdl;
+        // Construir la ruta completa al WSDL
+        $this->nombreWsdl = __DIR__.'/../Resources/'.$nombreArchivoWsdlBase;
         $this->urlProduccion = $urlEndpoint;
     }
 
@@ -195,27 +244,36 @@ class AfipWebService implements AfipWebServiceInterface
      *
      * Configura la versión de SOAP, la ubicación del servicio, el rastreo, el manejo de excepciones y el contexto del stream.
      *
-     * @throws AfipException Si el WSDL o la URL no están definidos después de la inicialización.
+     * @throws ConfigurationException Si el WSDL o la URL no están definidos después de la inicialización.
      */
     private function crearClienteSoap(): void
     {
         if ($this->nombreWsdl === null || $this->urlProduccion === null) {
-            throw new AfipException('WSDL o URL no están configurados para la inicialización de SoapClient.', 3);
+            throw new ConfigurationException('WSDL o URL no están configurados para la inicialización de SoapClient. Esto no debería ocurrir.', ErrorCodes::CONFIG_INVALID_WSDL_PATH);
         }
 
-        $this->clienteSoap = new SoapClient($this->nombreWsdl, [
-            'soap_version' => $this->versionSoap,
-            'location' => $this->urlProduccion,
-            'trace' => 1,
-            'exceptions' => $this->afip->getManejarExcepcionesSoap(),
-            'stream_context' => stream_context_create([
-                'ssl' => [
-                    'ciphers' => 'AES256-SHA',
-                    'verify_peer' => false,
-                    'verify_peer_name' => false,
-                ],
-            ]),
-        ]);
+        try {
+            $this->clienteSoap = new SoapClient($this->nombreWsdl, [
+                'soap_version' => $this->versionSoap,
+                'location' => $this->urlProduccion,
+                'trace' => 1,
+                'exceptions' => $this->afip->getManejarExcepcionesSoap(),
+                'stream_context' => stream_context_create([
+                    'ssl' => [
+                        'ciphers' => 'AES256-SHA',
+                        'verify_peer' => false,
+                        'verify_peer_name' => false,
+                    ],
+                ]),
+            ]);
+        } catch (SoapFault $soapFault) {
+            // Esto ocurre si el WSDL no se puede cargar o hay un problema de conexión al endpoint del WSDL
+            throw new ConfigurationException(
+                sprintf('No se pudo inicializar SoapClient con el WSDL %s. Posible problema de red o WSDL inválido. Error: %s', $this->nombreWsdl, $soapFault->getMessage()),
+                ErrorCodes::WEB_SERVICE_CLIENT_INIT_FAILED,
+                $soapFault
+            );
+        }
     }
 
     /**
@@ -227,21 +285,23 @@ class AfipWebService implements AfipWebServiceInterface
      * @param  string  $operation  El nombre de la operación que se ejecutó.
      * @param  mixed  $results  La respuesta recibida del Web Service de AFIP.
      *
-     * @throws AfipException Si la respuesta es un fallo SOAP, encapsulando el código y mensaje del fallo.
+     * @throws WebServiceException Si la respuesta es un fallo SOAP, encapsulando el código y mensaje del fallo.
      */
     private function verificarErrores(string $operacion, mixed $resultados): void
     {
         if (is_soap_fault($resultados)) {
             /** @var SoapFault $resultados */
-            throw new AfipException(
+            throw new WebServiceException(
                 sprintf(
-                    'Fallo SOAP en %s: %s%s%s',
+                    'Fallo SOAP en la operación "%s": %s%s%s',
                     $operacion,
                     (string) ($resultados->faultcode),
                     PHP_EOL,
                     (string) ($resultados->faultstring)
                 ),
-                4
+                ErrorCodes::WEB_SERVICE_SOAP_FAULT,
+                $resultados->faultcode,
+                new Exception($resultados->faultstring, (int) $resultados->faultcode)
             );
         }
     }
