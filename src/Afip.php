@@ -7,7 +7,19 @@ namespace PhpAfipWs;
 use DateTimeImmutable;
 use PhpAfipWs\Auth\TokenAuthorization;
 use PhpAfipWs\Exception\AfipException;
-use PhpAfipWs\WebService\AfipWebService;
+use PhpAfipWs\WebService\Contracts\AfipWebServiceInterface;
+use PhpAfipWs\WebService\Contracts\FacturacionElectronicaInterface;
+use PhpAfipWs\WebService\Contracts\PadronAlcanceCincoInterface;
+use PhpAfipWs\WebService\Contracts\PadronAlcanceCuatroInterface;
+use PhpAfipWs\WebService\Contracts\PadronAlcanceDiezInterface;
+use PhpAfipWs\WebService\Contracts\PadronAlcanceTreceInterface;
+use PhpAfipWs\WebService\Contracts\PadronConstanciaInscripcionInterface;
+use PhpAfipWs\WebService\FacturacionElectronica;
+use PhpAfipWs\WebService\PadronAlcanceCinco;
+use PhpAfipWs\WebService\PadronAlcanceCuatro;
+use PhpAfipWs\WebService\PadronAlcanceDiez;
+use PhpAfipWs\WebService\PadronAlcanceTrece;
+use PhpAfipWs\WebService\PadronConstanciaInscripcion;
 use SimpleXMLElement;
 use SoapClient;
 use SoapFault;
@@ -18,12 +30,12 @@ use SoapFault;
  * Esta clase maneja la configuración, autenticación y provee acceso
  * a los diferentes Web Services de AFIP.
  *
- * @property-read WebService\FacturacionElectronica $FacturacionElectronica
- * @property-read WebService\PadronAlcanceCuatro $PadronAlcanceCuatro
- * @property-read WebService\PadronAlcanceCinco $PadronAlcanceCinco
- * @property-read WebService\PadronAlcanceDiez $PadronAlcanceDiez
- * @property-read WebService\PadronAlcanceTrece $PadronAlcanceTrece
- * @property-read WebService\PadronConstanciaInscripcion $PadronConstanciaInscripcion
+ * @property-read FacturacionElectronicaInterface $FacturacionElectronica
+ * @property-read PadronAlcanceCuatroInterface $PadronAlcanceCuatro
+ * @property-read PadronAlcanceCincoInterface $PadronAlcanceCinco
+ * @property-read PadronAlcanceDiezInterface $PadronAlcanceDiez
+ * @property-read PadronAlcanceTreceInterface $PadronAlcanceTrece
+ * @property-read PadronConstanciaInscripcionInterface $PadronConstanciaInscripcion
  */
 class Afip
 {
@@ -34,7 +46,7 @@ class Afip
     private const URL_WSAA_PRUEBA = 'https://wsaahomo.afip.gov.ar/ws/services/LoginCms';
 
     /**
-     * Lista de Web Services implementados que pueden ser accedidos como propiedades.
+     * Nombres de los Web Services implementados que pueden ser accedidos como propiedades.
      *
      * @var string[]
      */
@@ -46,6 +58,13 @@ class Afip
         'PadronAlcanceTrece',
         'PadronConstanciaInscripcion',
     ];
+
+    /**
+     * Opciones de configuración.
+     *
+     * @var array<string, mixed>
+     */
+    public array $opciones;
 
     /**
      * Ruta al archivo WSDL de WSAA.
@@ -88,48 +107,47 @@ class Afip
     private int $cuit;
 
     /**
-     * Opciones de configuración.
-     *
-     * @var array<string, mixed>
-     */
-    private array $opciones;
-
-    /**
      * Caché para los clientes de Web Service instanciados.
      *
-     * @var array<string, AfipWebService>
+     * @var array<string, AfipWebServiceInterface>
      */
     private array $instanciasWebService = [];
+
+    /**
+     * Fábricas para instanciar los servicios web.
+     *
+     * @var array<string, callable(Afip): AfipWebServiceInterface>
+     */
+    private array $serviceFactories;
 
     /**
      * Constructor de Afip.
      *
      * @param  array<string, mixed>  $opciones  Opciones de configuración para la libreria PhpAfipWs.
-     *                                          - cuit: (int|string) Número de CUIT. Requerido. (Antes CUIT)
-     *                                          - modo_produccion: (bool) Indica si se usará el entorno de producción. Por defecto, false. (Antes production)
-     *                                          - ruta_certificado: (string) Ruta al archivo de certificado. (Antes cert)
-     *                                          - ruta_clave: (string) Ruta al archivo de clave privada. (Antes key)
-     *                                          - contrasena_clave: (string) Contraseña para la clave privada. Por defecto, 'xxxxx'. (Antes passphrase)
-     *                                          - carpeta_recursos: (string) Ruta a la carpeta de recursos. (Antes res_folder)
-     *                                          - carpeta_ta: (string) Ruta a la carpeta para los Tickets de Acceso. (Antes ta_folder)
-     *                                          - manejar_excepciones_soap: (bool) Indica si el cliente SOAP debe lanzar excepciones. Por defecto, false. (Antes exceptions)
+     * @param  array<string, callable(Afip): AfipWebServiceInterface>  $serviceFactories  Opcional. Permite inyectar fábricas para los Web Services.
      *
      * @throws AfipException Si las opciones son inválidas o los archivos requeridos no se encuentran.
      */
-    public function __construct(array $opciones)
+    public function __construct(array $opciones, array $serviceFactories = [])
     {
         ini_set('soap.wsdl_cache_enabled', '0');
 
         $this->inicializarOpciones($opciones);
         $this->configurarRutas();
         $this->validarArchivos();
+
+        $this->serviceFactories = $serviceFactories;
+
+        if (empty($this->serviceFactories)) {
+            $this->registerDefaultServiceFactories();
+        }
     }
 
     /**
      * Método mágico para acceder a los clientes de Web Service como propiedades.
      *
      * @param  string  $propiedad  El nombre del Web Service o propiedad a acceder.
-     * @return AfipWebService|mixed La instancia del Web Service solicitado o el valor de la propiedad.
+     * @return AfipWebServiceInterface|mixed La instancia del Web Service solicitado o el valor de la propiedad.
      *
      * @throws AfipException Si la propiedad o el Web Service no existe o su clase no se encuentra.
      */
@@ -137,13 +155,11 @@ class Afip
     {
         if (in_array($propiedad, self::WS_IMPLEMENTADOS)) {
             if (! isset($this->instanciasWebService[$propiedad])) {
-                $nombreClase = 'PhpAfipWs\WebService\\'.$propiedad;
-
-                if (! class_exists($nombreClase)) {
-                    throw new AfipException(sprintf('La clase del WebService %s no fue encontrada', $nombreClase), 1);
+                if (! isset($this->serviceFactories[$propiedad])) {
+                    throw new AfipException(sprintf('No se encontró la fábrica para el WebService %s', $propiedad), 1);
                 }
 
-                $this->instanciasWebService[$propiedad] = new $nombreClase($this);
+                $this->instanciasWebService[$propiedad] = $this->serviceFactories[$propiedad]($this);
             }
 
             return $this->instanciasWebService[$propiedad];
@@ -184,6 +200,14 @@ class Afip
     public function esProduccion(): bool
     {
         return (bool) $this->opciones['modo_produccion'];
+    }
+
+    /**
+     * Obtiene la opción de manejar excepciones SOAP.
+     */
+    public function getManejarExcepcionesSoap(): bool
+    {
+        return (bool) ($this->opciones['manejar_excepciones_soap'] ?? false);
     }
 
     /**
@@ -235,16 +259,16 @@ class Afip
      *
      * @param  string  $servicio  El nombre del servicio.
      * @param  array<string, mixed>  $opciones  Opciones de configuración para el servicio genérico.
-     * @return AfipWebService Una instancia del cliente de web service genérico.
+     * @return AfipWebServiceInterface Una instancia del cliente de web service genérico.
      *
      * @throws AfipException si ocurre un error.
      */
-    public function webService(string $servicio, array $opciones): AfipWebService
+    public function webService(string $servicio, array $opciones): AfipWebServiceInterface
     {
         $opciones['service'] = $servicio;
         $opciones['generic'] = true;
 
-        return new AfipWebService($this, $opciones);
+        return new WebService\AfipWebService($this, $opciones);
     }
 
     /**
@@ -257,6 +281,10 @@ class Afip
      */
     protected function crearServiceTA(string $servicio): bool
     {
+        if (! is_dir($this->carpetaTa) && ! mkdir($this->carpetaTa, 0777, true)) {
+            throw new AfipException(sprintf('No se pudo crear la carpeta para los TA: %s', $this->carpetaTa));
+        }
+
         $archivoTra = $this->crearTRA($servicio);
         $traFirmado = $this->firmarTRA($archivoTra, $servicio);
         $ta = $this->solicitarTADeWSAA($traFirmado);
@@ -265,9 +293,28 @@ class Afip
     }
 
     /**
+     * Registra las fábricas de servicios por defecto.
+     * Esto acopla la clase Afip con las implementaciones concretas de los servicios,
+     * pero es la opción por defecto si no se usa un contenedor externo.
+     */
+    private function registerDefaultServiceFactories(): void
+    {
+        $this->serviceFactories = [
+            'FacturacionElectronica' => fn (Afip $afip) => new FacturacionElectronica($afip),
+            'PadronAlcanceCuatro' => fn (Afip $afip) => new PadronAlcanceCuatro($afip),
+            'PadronAlcanceCinco' => fn (Afip $afip) => new PadronAlcanceCinco($afip),
+            'PadronAlcanceDiez' => fn (Afip $afip) => new PadronAlcanceDiez($afip),
+            'PadronAlcanceTrece' => fn (Afip $afip) => new PadronAlcanceTrece($afip),
+            'PadronConstanciaInscripcion' => fn (Afip $afip) => new PadronConstanciaInscripcion($afip),
+        ];
+    }
+
+    /**
      * Inicializa las propiedades desde el array de opciones.
      *
      * @param  array<string, mixed>  $opciones  Las opciones de configuración.
+     *
+     * @throws AfipException
      */
     private function inicializarOpciones(array $opciones): void
     {
@@ -282,13 +329,13 @@ class Afip
         $this->cuit = (int) $opciones['cuit'];
 
         $this->opciones = array_merge([
-            'modo_produccion' => false, // Cambiado de 'production'
-            'contrasena_clave' => 'xxxxx', // Cambiado de 'passphrase'
-            'manejar_excepciones_soap' => false, // Cambiado de 'exceptions'
-            'ruta_certificado' => 'cert', // Cambiado de 'cert'
-            'ruta_clave' => 'key', // Cambiado de 'key'
-            'carpeta_recursos' => null, // Cambiado de 'res_folder'
-            'carpeta_ta' => null, // Cambiado de 'ta_folder'
+            'modo_produccion' => false,
+            'contrasena_clave' => 'xxxxx',
+            'manejar_excepciones_soap' => false,
+            'ruta_certificado' => 'cert',
+            'ruta_clave' => 'key',
+            'carpeta_recursos' => null,
+            'carpeta_ta' => null,
         ], $opciones);
 
         $this->contraseñaClave = (string) ($this->opciones['contrasena_clave']);
@@ -336,7 +383,7 @@ class Afip
     /**
      * Construye la ruta del archivo para el Ticket de Acceso (TA) de un servicio dado.
      *
-     * @param  string  $nombreServicio  El nombre del servicio. (Antes $servicio)
+     * @param  string  $nombreServicio  El nombre del servicio.
      * @return string La ruta completa al archivo TA.
      */
     private function getRutaArchivoTA(string $nombreServicio): string
@@ -448,7 +495,7 @@ class Afip
     /**
      * Solicita el Ticket de Acceso (TA) al servicio WSAA.
      *
-     * @param  string  $cmsFirmado  La solicitud CMS firmada. (Antes $cms)
+     * @param  string  $cmsFirmado  La solicitud CMS firmada.
      * @return string La respuesta XML del WSAA que contiene el TA.
      *
      * @throws AfipException Si ocurre un fallo de SOAP.
@@ -459,7 +506,7 @@ class Afip
             'soap_version' => SOAP_1_2,
             'location' => $this->wsaaUrl,
             'trace' => 1,
-            'exceptions' => $this->opciones['manejar_excepciones_soap'],
+            'exceptions' => $this->getManejarExcepcionesSoap(),
             'stream_context' => stream_context_create([
                 'ssl' => [
                     'ciphers' => 'AES256-SHA',
@@ -491,14 +538,12 @@ class Afip
      * @param  string  $servicio  El nombre del servicio.
      * @param  string  $ta  El contenido XML del TA.
      * @return bool True en caso de éxito.
-     *
-     * @throws AfipException Si no se puede escribir en el archivo.
      */
     private function guardarArchivoTA(string $servicio, string $ta): bool
     {
         $archivoTa = $this->getRutaArchivoTA($servicio);
 
-        if (in_array(file_put_contents($archivoTa, $ta), [0, false], true)) {
+        if (file_put_contents($archivoTa, $ta) === false) {
             throw new AfipException('Error al escribir el archivo TA: '.$archivoTa, 5);
         }
 
