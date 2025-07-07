@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace PhpAfipWs\Auth;
 
+use DateTimeImmutable;
+
 /**
  * Clase que representa el Token de Autorización (TA) de AFIP.
  *
@@ -15,14 +17,16 @@ namespace PhpAfipWs\Auth;
 class TokenAuthorization
 {
     /**
-     * Constructor de TokenAuthorization.
+     * Constructor de TokenAutorizacion.
      *
      * @param  string  $token  El token de acceso.
-     * @param  string  $sign  La firma del token.
+     * @param  string  $firma  La firma del token.
+     * @param  DateTimeImmutable  $tiempoExpiracion  El momento en que expira el token.
      */
     public function __construct(
         private string $token,
-        private string $sign
+        private string $firma,
+        private DateTimeImmutable $tiempoExpiracion
     ) {}
 
     /**
@@ -42,6 +46,29 @@ class TokenAuthorization
      */
     public function getSign(): string
     {
-        return $this->sign;
+        return $this->firma;
+    }
+
+    /**
+     * Obtiene el momento de expiración del token.
+     *
+     * @return DateTimeImmutable El momento de expiración.
+     */
+    public function obtenerTiempoExpiracion(): DateTimeImmutable
+    {
+        return $this->tiempoExpiracion;
+    }
+
+    /**
+     * Verifica si el token ha expirado.
+     *
+     * @param  int  $margenSegundos  Margen de segundos antes de la expiración real para considerarlo expirado.
+     * @return bool True si el token ha expirado o está próximo a expirar dentro del margen.
+     */
+    public function estaExpirado(int $margenSegundos = 0): bool
+    {
+        $tiempoActual = new DateTimeImmutable();
+
+        return $tiempoActual->getTimestamp() + $margenSegundos >= $this->tiempoExpiracion->getTimestamp();
     }
 }
