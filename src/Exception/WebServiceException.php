@@ -18,7 +18,7 @@ class WebServiceException extends AfipException
      * @param  string  $message  El mensaje de la excepción.
      * @param  int  $code  El código de la excepción.
      * @param  string|int|null  $soapFaultCode  El código de fallo SOAP.
-     * @param Throwable|null $throwable La excepción previa utilizada para encadenar excepciones.
+     * @param  Throwable|null  $throwable  La excepción previa utilizada para encadenar excepciones.
      */
     public function __construct(string $message, int $code = 0, protected string|int|null $soapFaultCode = null, ?Throwable $throwable = null)
     {
