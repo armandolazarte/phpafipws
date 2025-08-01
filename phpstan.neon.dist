@@ -1,0 +1,12 @@
+parameters:
+    level: max
+    paths:
+        - src
+
+    reportUnmatchedIgnoredErrors: true
+
+    # Configuración específica para enums PHP 8.1+
+    checkUninitializedProperties: true
+
+    # Ignorar errores específicos de enums durante la migración
+    ignoreErrors: []

@@ -1,0 +1,61 @@
+# Dependencies
+/vendor/
+composer.lock
+
+# IDE
+.kiro/
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# PHPUnit
+.phpunit.cache
+.phpunit.result.cache
+coverage/
+phpunit.phar
+
+
+# PHP CS Fixer
+.php-cs-fixer.cache
+
+# PHPStan
+.phpstan.cache
+
+# AFIP Resources (sensitive files)
+/src/Resources/*.crt
+/src/Resources/*.key
+/src/Resources/*.p12
+/resources/*.crt
+/resources/*.key
+/resources/*.p12
+/ejemplos/resources/*.crt
+/ejemplos/resources/*.key
+/ejemplos/resources/*.p12
+
+# Ticket Access files
+/ta/
+/TA-*.xml
+/ejemplos/ta/
+/ejemplos/TA-*.xml
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build artifacts
+/build/
+/dist/
+
+# Temporary files
+/tmp/
+/temp/
+*.tmp

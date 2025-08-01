@@ -1,0 +1,72 @@
+{
+    "name": "armandolazarte/phpafipws",
+    "description": "Librería para usar los Web Services de AFIP (ex AFIP).",
+    "keywords": [
+        "afip",
+        "AFIP",
+        "facturacion-electronica",
+        "soap",
+        "cae",
+        "padron",
+        "web-services"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Armando Lazarte",
+            "email": "armando_lazarte@hotmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=8.0",
+        "ext-soap": "*",
+        "ext-openssl": "*",
+        "ext-simplexml": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.85.1",
+        "pestphp/pest": "^4.0.0",
+        "phpstan/phpstan": "^2.1.21",
+        "rector/rector": "^2.1.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "PhpAfipWs\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "preferred-install": "dist",
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "scripts": {
+        "lint": "php-cs-fixer fix --allow-risky=yes",
+        "refactor": "rector",
+        "test:lint": "php-cs-fixer fix --allow-risky=yes --dry-run --diff",
+        "test:unit": "pest",
+        "test:types": "phpstan",
+        "test:refactor": "rector --dry-run",
+        "modernize": [
+            "@lint",
+            "@refactor",
+            "@test:types",
+            "@test:unit"
+        ],
+        "quality": [
+            "@test:lint",
+            "@test:refactor",
+            "@test:types",
+            "@test:unit"
+        ]
+    }
+}
