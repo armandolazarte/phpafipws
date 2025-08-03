@@ -1,32 +1,109 @@
 # Changelog
 
-Todos los cambios notables en este proyecto serán documentados en este archivo.
+Todos los cambios notables de este proyecto serán documentados en este archivo.
 
-El formato se basa en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/)
-y este proyecto se adhiere a [Semantic Versioning](https://semver.org/lang/es/).
+El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
+y este proyecto adhiere al [Versionado Semántico](https://semver.org/lang/es/).
 
-## [Sin publicar]
+## [1.1.0] - 2025-02-08
 
-## [1.0.0] - 2025-02-08
+### ✨ Nueva funcionalidad
 
-### Agregado
+Agregados nuevos métodos para simplificar el trabajo con Facturación Electrónica.
 
--   SDK moderno para Web Services de AFIP con PHP 8.1+
--   Soporte completo para Facturación Electrónica (WSFE)
--   Múltiples Web Services: PadronAlcanceCuatro, PadronAlcanceCinco, ConstanciaInscripcion, PadronAlcanceDiez, PadronAlcanceTrece
--   Sistema robusto de manejo de excepciones con contexto detallado
--   65+ tests automatizados con Pest 4
--   Ejemplos completos para todos los casos de uso
--   Documentación exhaustiva y guías de uso
--   Tipado estricto y compatibilidad con PHP 8.1+
--   Configuración flexible y personalizable
--   Manejo seguro de certificados y autenticación
+### ✨ Agregado
 
-### Características
+#### Nuevos métodos en FacturacionElectronica
 
--   API intuitiva y bien documentada
--   Manejo robusto de errores con excepciones específicas
--   Soporte para modo producción y homologación
--   Validación automática de datos
--   Logging y debugging avanzado
--   Estructura modular y extensible
+-   **`obtenerUltimoNumeroComprobante(int $puntoVenta, int $tipoComprobante): int`**
+
+    -   Extrae directamente el número del último comprobante como entero
+    -   Incluye validación robusta de estructura de respuesta
+    -   Manejo de errores con excepciones específicas
+
+-   **`autorizarProximoComprobante(array $datosComprobante): mixed`**
+    -   Calcula automáticamente el próximo número de comprobante
+    -   Simplifica el proceso de autorización
+    -   Valida tipos de datos de entrada
+    -   Soporta valores por defecto para PtoVta y CbteTipo
+
+#### Mejoras en validación y tipos
+
+-   Validación de tipos estricta en todos los métodos nuevos
+-   Verificación de estructura de respuestas de AFIP
+-   Manejo robusto de errores con mensajes descriptivos
+-   Documentación PHPDoc completa con tipos específicos
+
+#### Tests y calidad
+
+-   **14 nuevos tests** para los métodos agregados
+-   Cobertura completa de casos de éxito y error
+-   Tests de validación de tipos y estructura
+-   Uso de stubs para simulación de comportamientos
+
+### 🔧 Mejorado
+
+-   **Manejo de errores**: Excepciones más específicas con contexto detallado
+-   **Validación de datos**: Verificación de tipos antes de procesamiento
+-   **Documentación**: README actualizado con ejemplos de los nuevos métodos
+-   **Calidad de código**: Cumple con PHPStan nivel máximo sin errores
+
+### 📊 Estadísticas
+
+-   **79 tests** con **212 assertions** (anteriormente 65 tests con 184 assertions)
+-   **0 errores** en análisis estático con PHPStan
+-   **Cobertura completa** de métodos de Facturación Electrónica
+
+### 🛠️ Características principales
+
+-   **SDK completo** para Web Services de AFIP
+-   **PHP 8.1+** con tipado estricto
+-   **Manejo de certificados** y autenticación segura
+-   **API intuitiva** y bien documentada
+-   **Tests automatizados** con Pest 4
+-   **Calidad de código** verificada con herramientas modernas
+
+### 📚 Documentación
+
+-   README actualizado con ejemplos de uso
+-   Documentación de métodos nuevos
+-   Guías de contribución y desarrollo
+-   Ejemplos de manejo de errores
+
+### 🔗 Web Services soportados
+
+-   FacturacionElectronica (WSFE)
+-   PadronAlcanceCuatro (A4)
+-   PadronAlcanceCinco (A5)
+-   ConstanciaInscripcion
+-   PadronAlcanceDiez (A10)
+-   PadronAlcanceTrece (A13)
+
+---
+
+## [1.0.0] - 2025-01-15
+
+### 🎉 Primera versión estable
+
+-   **SDK completo** para Web Services de AFIP
+-   **PHP 8.1+** con tipado estricto
+-   **Manejo de certificados** y autenticación segura
+-   **API intuitiva** y bien documentada
+-   **65 tests** automatizados con Pest 4
+-   **Web Services soportados**: FacturacionElectronica, PadronAlcanceCuatro, PadronAlcanceCinco, ConstanciaInscripcion, PadronAlcanceDiez, PadronAlcanceTrece
+
+---
+
+## Formato de versiones
+
+-   **[MAJOR.MINOR.PATCH]** - Fecha en formato YYYY-MM-DD
+-   **MAJOR**: Cambios incompatibles en la API
+-   **MINOR**: Funcionalidad agregada de manera compatible
+-   **PATCH**: Correcciones de bugs compatibles
+
+## Enlaces
+
+-   [Repositorio](https://github.com/armandolazarte/phpafipws)
+-   [Packagist](https://packagist.org/packages/armandolazarte/phpafipws)
+-   [Issues](https://github.com/armandolazarte/phpafipws/issues)
+-   [Releases](https://github.com/armandolazarte/phpafipws/releases)
