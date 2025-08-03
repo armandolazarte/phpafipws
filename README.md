@@ -8,7 +8,7 @@
 [![Version](https://img.shields.io/packagist/v/armandolazarte/phpafipws)](https://packagist.org/packages/armandolazarte/phpafipws)
 [![License](https://img.shields.io/packagist/l/armandolazarte/phpafipws)](https://packagist.org/packages/armandolazarte/phpafipws)
 [![PHP Version](https://img.shields.io/packagist/php-v/armandolazarte/phpafipws)](https://packagist.org/packages/armandolazarte/phpafipws)
-[![Test Coverage](https://img.shields.io/badge/tests-65%20passing-brightgreen)](https://github.com/armandolazarte/phpafipws)
+[![Test Coverage](https://img.shields.io/badge/tests-79%20passing-brightgreen)](https://github.com/armandolazarte/phpafipws)
 
 </div>
 
@@ -24,8 +24,16 @@ PhpAfipWs es un SDK moderno y robusto para interactuar con los Web Services de A
 -   **Fácil de usar**: API intuitiva y bien documentada
 -   **Completo**: Soporte para múltiples Web Services de AFIP
 -   **Seguro**: Manejo robusto de certificados y autenticación
--   **Confiable**: 65+ tests automatizados con Pest 4
+-   **Confiable**: 79+ tests automatizados con Pest 4
 -   **Mantenido**: Actualizaciones regulares y soporte activo
+
+### 🆕 Novedades v1.1.0
+
+-   **Método simplificado**: `autorizarProximoComprobante()` calcula automáticamente el próximo número
+-   **Extracción directa**: `obtenerUltimoNumeroComprobante()` devuelve directamente el número como entero
+-   **Validación robusta**: Validación de tipos y estructura de respuestas mejorada
+-   **Manejo de errores**: Excepciones específicas con mensajes descriptivos
+-   **Tests completos**: Cobertura total de los nuevos métodos con 14 tests adicionales
 
 ## 🚀 Instalación
 
@@ -87,28 +95,63 @@ $afip = new Afip([
 
 ### Facturación Electrónica
 
-```php
-// Obtener el último comprobante autorizado
-$ultimoComprobante = $afip->FacturacionElectronica
-    ->obtenerUltimoComprobante($puntoDeVenta = 1, $tipoFactura = 1);
+#### Método Simplificado (Recomendado)
 
-// Crear una factura
+```php
+// Autorizar el próximo comprobante automáticamente
 $datosFactura = [
-    'CantReg' => 1,
     'PtoVta' => 1,
     'CbteTipo' => 1, // Factura A
     'Concepto' => 1, // Productos
     'DocTipo' => 80, // CUIT
     'DocNro' => 33693450239,
-    'CbteDesde' => $ultimoComprobante->FECompUltimoAutorizadoResult->CbteNro + 1,
-    'CbteHasta' => $ultimoComprobante->FECompUltimoAutorizadoResult->CbteNro + 1,
     'CbteFch' => (int) date('Ymd'),
     'ImpTotal' => 121.00,
     'ImpNeto' => 100.00,
     'ImpIVA' => 21.00,
     'MonId' => 'PES',
     'MonCotiz' => 1,
-    'CondicionIVAReceptorId' => 1,
+    'Iva' => [
+        [
+            'Id' => 5, // 21%
+            'BaseImp' => 100.00,
+            'Importe' => 21.00,
+        ],
+    ],
+];
+
+// El SDK calcula automáticamente el próximo número de comprobante
+$respuesta = $afip->FacturacionElectronica->autorizarProximoComprobante($datosFactura);
+
+if ($respuesta->FECAESolicitarResult->FeDetResp->FECAEDetResponse->Resultado === 'A') {
+    echo "¡Factura autorizada!\n";
+    echo "CAE: " . $respuesta->FECAESolicitarResult->FeDetResp->FECAEDetResponse->CAE . "\n";
+    echo "Número: " . $respuesta->FECAESolicitarResult->FeDetResp->FECAEDetResponse->CbteDesde . "\n";
+}
+```
+
+#### Método Manual (Control Total)
+
+```php
+// Obtener el último número de comprobante
+$ultimoNumero = $afip->FacturacionElectronica
+    ->obtenerUltimoNumeroComprobante($puntoDeVenta = 1, $tipoFactura = 1);
+
+// Crear una factura con número específico
+$datosFactura = [
+    'PtoVta' => 1,
+    'CbteTipo' => 1, // Factura A
+    'Concepto' => 1, // Productos
+    'DocTipo' => 80, // CUIT
+    'DocNro' => 33693450239,
+    'CbteDesde' => $ultimoNumero + 1,
+    'CbteHasta' => $ultimoNumero + 1,
+    'CbteFch' => (int) date('Ymd'),
+    'ImpTotal' => 121.00,
+    'ImpNeto' => 100.00,
+    'ImpIVA' => 21.00,
+    'MonId' => 'PES',
+    'MonCotiz' => 1,
     'Iva' => [
         [
             'Id' => 5, // 21%
@@ -157,17 +200,48 @@ echo $afip->obtenerCuit(); // CUIT configurado
 echo $afip->esModoProduccion() ? 'Producción' : 'Homologación';
 ```
 
+### Facturación Electrónica - Métodos Principales
+
+```php
+// Verificar estado del servidor AFIP
+$estado = $afip->FacturacionElectronica->obtenerEstadoServidor();
+
+// Obtener último número de comprobante (método directo)
+$ultimoNumero = $afip->FacturacionElectronica
+    ->obtenerUltimoNumeroComprobante($puntoVenta = 1, $tipoComprobante = 1);
+
+// Obtener respuesta completa del último comprobante
+$ultimoComprobante = $afip->FacturacionElectronica
+    ->obtenerUltimoComprobante($puntoVenta = 1, $tipoComprobante = 1);
+
+// Autorizar comprobante con número específico
+$respuesta = $afip->FacturacionElectronica->autorizarComprobante([$datosComprobante]);
+
+// Autorizar próximo comprobante automáticamente (recomendado)
+$respuesta = $afip->FacturacionElectronica->autorizarProximoComprobante($datosComprobante);
+```
+
+### Consultas de Parámetros
+
+```php
+// Obtener tipos de comprobantes disponibles
+$tiposComprobante = $afip->FacturacionElectronica->obtenerTiposComprobante();
+
+// Obtener tipos de documentos
+$tiposDocumento = $afip->FacturacionElectronica->obtenerTiposDocumento();
+
+// Obtener tipos de monedas
+$tiposMoneda = $afip->FacturacionElectronica->obtenerTiposMoneda();
+
+// Obtener condiciones de IVA para el receptor
+$condicionesIva = $afip->FacturacionElectronica->obtenerCondicionesIvaReceptor();
+```
+
 ### Consultas de Padrón
 
 ```php
 // Consultar datos de un CUIT
 $datos = $afip->PadronAlcanceCuatro->obtenerPersona(20123456789);
-```
-
-### Estado del Servidor
-
-```php
-$estado = $afip->FacturacionElectronica->obtenerEstadoServidor();
 ```
 
 ## ⚙️ Configuración Avanzada
@@ -253,11 +327,12 @@ composer test:unit
 
 ### Cobertura de Tests
 
--   ✅ **65 tests** con **184 assertions**
+-   ✅ **79 tests** con **212 assertions**
 -   ✅ Tests unitarios para todas las clases principales
 -   ✅ Tests de integración para flujos completos
 -   ✅ Validación de configuraciones y excepciones
 -   ✅ Manejo de errores y casos edge
+-   ✅ Cobertura completa de métodos de Facturación Electrónica
 
 ### Estructura de Tests
 
