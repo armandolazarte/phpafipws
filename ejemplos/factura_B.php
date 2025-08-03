@@ -36,9 +36,10 @@ try {
     $tipoDeFactura = 6; // 6 = Factura B
 
     /**
-     * Número de la ultima Factura B
+     * MÉTODO NUEVO: Obtener directamente el último número como entero
      **/
-    $ultimoComprobante = $facturacionElectronica->obtenerUltimoComprobante($puntoDeVenta, $tipoDeFactura);
+    $ultimoNumero = $facturacionElectronica->obtenerUltimoNumeroComprobante($puntoDeVenta, $tipoDeFactura);
+    echo "Último número de Factura B: {$ultimoNumero}\n\n";
 
     /**
      * Concepto de la factura
@@ -62,11 +63,6 @@ try {
      * Numero de documento del comprador (0 para consumidor final)
      **/
     $numeroDeDocumento = 0;
-
-    /**
-     * Numero de factura
-     **/
-    $numeroDeFactura = $ultimoComprobante->FECompUltimoAutorizadoResult->CbteNro + 1;
 
     /**
      * Fecha de la factura en formato aaaa-mm-dd (hasta 10 dias antes y 10 dias despues)
@@ -124,14 +120,14 @@ try {
         $fechaVencimientoPago = null;
     }
 
+    // MÉTODO NUEVO: Usar autorizarProximoComprobante() - más simple y seguro
+    // No necesitamos calcular manualmente el número de factura
     $datosComprobante = [
         'PtoVta' => $puntoDeVenta,
         'CbteTipo' => $tipoDeFactura,
         'Concepto' => $concepto,
         'DocTipo' => $tipoDeDocumento,
         'DocNro' => $numeroDeDocumento,
-        'CbteDesde' => $numeroDeFactura,
-        'CbteHasta' => $numeroDeFactura,
         'CbteFch' => (int) (str_replace('-', '', $fecha)),
         'FchServDesde' => $fechaServicioDesde,
         'FchServHasta' => $fechaServicioHasta,
@@ -155,9 +151,10 @@ try {
     ];
 
     /**
-     * Creamos la Factura
+     * MÉTODO NUEVO: autorizarProximoComprobante() calcula automáticamente el próximo número
      **/
-    $respuesta = $facturacionElectronica->autorizarComprobante([$datosComprobante]);
+    echo "Autorizando próximo comprobante...\n";
+    $respuesta = $facturacionElectronica->autorizarProximoComprobante($datosComprobante);
 
     /**
      * Mostramos por pantalla los datos de la nueva Factura

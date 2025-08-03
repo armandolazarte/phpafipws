@@ -36,9 +36,10 @@ try {
     $tipoDeNota = 13; // 13 = Nota de Crédito C
 
     /**
-     * Número de la ultima Nota de Crédito C
+     * MÉTODO NUEVO: Obtener directamente el último número como entero
      **/
-    $ultimoComprobante = $facturacionElectronica->obtenerUltimoComprobante($puntoDeVenta, $tipoDeNota);
+    $ultimoNumero = $facturacionElectronica->obtenerUltimoNumeroComprobante($puntoDeVenta, $tipoDeNota);
+    echo "Último número de Nota de Crédito C: {$ultimoNumero}\n\n";
 
     /**
      * Numero del punto de venta de la Factura
@@ -78,11 +79,6 @@ try {
      * Numero de documento del comprador (0 para consumidor final)
      **/
     $numeroDeDocumento = 33693450239;
-
-    /**
-     * Numero de comprobante
-     **/
-    $numeroDeNota = $ultimoComprobante->FECompUltimoAutorizadoResult->CbteNro + 1;
 
     /**
      * Fecha de la Nota de Crédito en formato aaaa-mm-dd (hasta 10 dias antes y 10 dias despues)
@@ -130,14 +126,14 @@ try {
         $fechaVencimientoPago = null;
     }
 
+    // MÉTODO NUEVO: Usar autorizarProximoComprobante() - más simple y seguro
+    // No necesitamos calcular manualmente el número de nota de crédito
     $datosComprobante = [
         'PtoVta' => $puntoDeVenta,
         'CbteTipo' => $tipoDeNota,
         'Concepto' => $concepto,
         'DocTipo' => $tipoDeDocumento,
         'DocNro' => $numeroDeDocumento,
-        'CbteDesde' => $numeroDeNota,
-        'CbteHasta' => $numeroDeNota,
         'CbteFch' => (int) (str_replace('-', '', $fecha)),
         'FchServDesde' => $fechaServicioDesde,
         'FchServHasta' => $fechaServicioHasta,
@@ -161,9 +157,10 @@ try {
     ];
 
     /**
-     * Creamos la Nota de Crédito
+     * MÉTODO NUEVO: autorizarProximoComprobante() calcula automáticamente el próximo número
      **/
-    $respuesta = $facturacionElectronica->autorizarComprobante([$datosComprobante]);
+    echo "Autorizando próxima Nota de Crédito...\n";
+    $respuesta = $facturacionElectronica->autorizarProximoComprobante($datosComprobante);
 
     /**
      * Mostramos por pantalla los datos de la nueva Nota de Crédito

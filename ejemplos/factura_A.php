@@ -28,15 +28,15 @@ try {
 
     $tipoDeFactura = 1; // 1 = Factura A
 
-    $ultimoComprobante = $facturacionElectronica->obtenerUltimoComprobante($puntoDeVenta, $tipoDeFactura);
+    // MÉTODO NUEVO: Obtener directamente el último número como entero
+    $ultimoNumero = $facturacionElectronica->obtenerUltimoNumeroComprobante($puntoDeVenta, $tipoDeFactura);
+    echo "Último número de comprobante: {$ultimoNumero}\n\n";
 
     $concepto = 1; // 1 = Productos, 2 = Servicios, 3 = Productos y Servicios
 
     $tipoDeDocumento = 80; // 80 = CUIT, 86 = CUIL, 96 = DNI, 99 = Consumidor Final
 
     $numeroDeDocumento = 33693450239; // 0 para consumidor final
-
-    $numeroDeFactura = $ultimoComprobante->FECompUltimoAutorizadoResult->CbteNro + 1;
 
     $fecha = date('Y-m-d'); // formato aaaa-mm-dd (hasta 10 dias antes y 10 dias despues)
 
@@ -80,15 +80,14 @@ try {
         $fechaVencimientoPago = null;
     }
 
+    // MÉTODO NUEVO: Usar autorizarProximoComprobante() para simplificar el proceso
+    // No necesitamos especificar CbteDesde/CbteHasta, el SDK los calcula automáticamente
     $datosComprobante = [
-        'CantReg' => 1, // Cantidad de facturas a registrar
         'PtoVta' => $puntoDeVenta,
         'CbteTipo' => $tipoDeFactura,
         'Concepto' => $concepto,
         'DocTipo' => $tipoDeDocumento,
         'DocNro' => $numeroDeDocumento,
-        'CbteDesde' => $numeroDeFactura,
-        'CbteHasta' => $numeroDeFactura,
         'CbteFch' => (int) (str_replace('-', '', $fecha)),
         'FchServDesde' => $fechaServicioDesde,
         'FchServHasta' => $fechaServicioHasta,
@@ -111,7 +110,9 @@ try {
         ],
     ];
 
-    $respuesta = $facturacionElectronica->autorizarComprobante([$datosComprobante]);
+    // MÉTODO NUEVO: autorizarProximoComprobante() calcula automáticamente el próximo número
+    echo "Autorizando próximo comprobante...\n";
+    $respuesta = $facturacionElectronica->autorizarProximoComprobante($datosComprobante);
 
     echo "Respuesta de AFIP:\n";
     print_r($respuesta);

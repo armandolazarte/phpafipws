@@ -36,9 +36,10 @@ try {
     $tipoDeNota = 8; // 8 = Nota de Crédito B
 
     /**
-     * Número de la ultima Nota de Crédito B
+     * MÉTODO NUEVO: Obtener directamente el último número como entero
      **/
-    $ultimoComprobante = $facturacionElectronica->obtenerUltimoComprobante($puntoDeVenta, $tipoDeNota);
+    $ultimoNumero = $facturacionElectronica->obtenerUltimoNumeroComprobante($puntoDeVenta, $tipoDeNota);
+    echo "Último número de Nota de Crédito B: {$ultimoNumero}\n\n";
 
     /**
      * Numero del punto de venta de la Factura
@@ -61,9 +62,6 @@ try {
      *
      * Opciones:
      *
-     * 1 = Productos
-     * 2 = Servicios
-     * 3 = Productos y Servicios
      * 1 = Productos, 2 = Servicios, 3 = Productos y Servicios
      **/
     $concepto = 1;
@@ -73,10 +71,6 @@ try {
      *
      * Opciones:
      *
-     * 80 = CUIT
-     * 86 = CUIL
-     * 96 = DNI
-     * 99 = Consumidor Final
      * 80 = CUIT, 86 = CUIL, 96 = DNI, 99 = Consumidor Final
      **/
     $tipoDeDocumento = 99;
@@ -85,11 +79,6 @@ try {
      * Numero de documento del comprador (0 para consumidor final)
      **/
     $numeroDeDocumento = 0;
-
-    /**
-     * Numero de Nota de Crédito
-     **/
-    $numeroDeNota = $ultimoComprobante->FECompUltimoAutorizadoResult->CbteNro + 1;
 
     /**
      * Fecha de la Nota de Crédito en formato aaaa-mm-dd (hasta 10 dias antes y 10 dias despues)
@@ -110,7 +99,6 @@ try {
     /**
      * Importe de IVA
      **/
-    $importe_iva = 21;
     $importeIva = 21;
 
     /**
@@ -118,17 +106,6 @@ try {
      *
      * Opciones:
      *
-     * 1 = IVA Responsable Inscripto
-     * 4 = IVA Sujeto Exento
-     * 5 = Consumidor Final
-     * 6 = Responsable Monotributo
-     * 7 = Sujeto No Categorizado
-     * 8 = Proveedor del Exterior
-     * 9 = Cliente del Exterior
-     * 10 = IVA Liberado – Ley N° 19.640
-     * 13 = Monotributista Social
-     * 15 = IVA No Alcanzado
-     * 16 = Monotributo Trabajador Independiente Promovido
      * 1 = IVA Responsable Inscripto, 4 = IVA Sujeto Exento, 5 = Consumidor Final,
      * 6 = Responsable Monotributo, 7 = Sujeto No Categorizado, 8 = Proveedor del Exterior,
      * 9 = Cliente del Exterior, 10 = IVA Liberado – Ley N° 19.640, 13 = Monotributista Social,
@@ -160,14 +137,14 @@ try {
         $fechaVencimientoPago = null;
     }
 
+    // MÉTODO NUEVO: Usar autorizarProximoComprobante() - más simple y seguro
+    // No necesitamos calcular manualmente el número de nota de crédito
     $datosComprobante = [
         'PtoVta' => $puntoDeVenta,
         'CbteTipo' => $tipoDeNota,
         'Concepto' => $concepto,
         'DocTipo' => $tipoDeDocumento,
         'DocNro' => $numeroDeDocumento,
-        'CbteDesde' => $numeroDeNota,
-        'CbteHasta' => $numeroDeNota,
         'CbteFch' => (int) (str_replace('-', '', $fecha)),
         'FchServDesde' => $fechaServicioDesde,
         'FchServHasta' => $fechaServicioHasta,
@@ -198,9 +175,10 @@ try {
     ];
 
     /**
-     * Creamos la Nota de Crédito
+     * MÉTODO NUEVO: autorizarProximoComprobante() calcula automáticamente el próximo número
      **/
-    $respuesta = $facturacionElectronica->autorizarComprobante([$datosComprobante]);
+    echo "Autorizando próxima Nota de Crédito...\n";
+    $respuesta = $facturacionElectronica->autorizarProximoComprobante($datosComprobante);
 
     /**
      * Mostramos por pantalla los datos de la nueva Nota de Crédito
