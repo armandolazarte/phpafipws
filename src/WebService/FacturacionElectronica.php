@@ -76,6 +76,37 @@ class FacturacionElectronica extends AfipWebService
     }
 
     /**
+     * Obtiene el número del último comprobante autorizado.
+     *
+     * Extrae el número del comprobante de la respuesta del servicio AFIP
+     * para el punto de venta y tipo de comprobante especificados.
+     *
+     * @param  int  $puntoVenta  El punto de venta del comprobante.
+     * @param  int  $tipoComprobante  El tipo de comprobante (ej. 1, 6, 11).
+     * @return int El número del último comprobante autorizado.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerUltimoNumeroComprobante(int $puntoVenta, int $tipoComprobante): int
+    {
+        $respuesta = $this->obtenerUltimoComprobante($puntoVenta, $tipoComprobante);
+
+        if (! is_object($respuesta) || ! isset($respuesta->FECompUltimoAutorizadoResult) || ! is_object($respuesta->FECompUltimoAutorizadoResult) || ! isset($respuesta->FECompUltimoAutorizadoResult->CbteNro)) {
+            throw new WebServiceException('La respuesta del servicio no tiene la estructura esperada');
+        }
+
+        $numeroComprobante = $respuesta->FECompUltimoAutorizadoResult->CbteNro;
+
+        if (! is_numeric($numeroComprobante)) {
+            throw new WebServiceException('El número de comprobante no es válido');
+        }
+
+        return (int) $numeroComprobante;
+    }
+
+    /**
      * Solicita la autorización (CAE) para uno o más comprobantes.
      *
      * @param  array<array<string, mixed>>  $comprobantes  Array de comprobantes a autorizar.
@@ -108,6 +139,45 @@ class FacturacionElectronica extends AfipWebService
         ];
 
         return $this->ejecutarSolicitud('FECAESolicitar', $params);
+    }
+
+    /**
+     * Autoriza el próximo comprobante consecutivo para un tipo y punto de venta dados.
+     *
+     * Combina la obtención del último comprobante con la autorización de uno nuevo.
+     * Este método se encarga de calcular automáticamente el número de comprobante.
+     *
+     * @param  array<string, mixed>  $datosComprobante  Los datos del comprobante a autorizar, sin incluir 'CbteDesde' y 'CbteHasta'.
+     * @return mixed La respuesta completa del servicio de AFIP.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     * @throws FacturacionElectronicaException Si los datos del comprobante son inválidos.
+     */
+    public function autorizarProximoComprobante(array $datosComprobante): mixed
+    {
+        $puntoDeVentaRaw = $datosComprobante['PtoVta'] ?? 1;
+        $tipoDeComprobanteRaw = $datosComprobante['CbteTipo'] ?? 1;
+
+        if (! is_numeric($puntoDeVentaRaw)) {
+            throw new FacturacionElectronicaException('El punto de venta debe ser un valor numérico');
+        }
+
+        if (! is_numeric($tipoDeComprobanteRaw)) {
+            throw new FacturacionElectronicaException('El tipo de comprobante debe ser un valor numérico');
+        }
+
+        $puntoDeVenta = (int) $puntoDeVentaRaw;
+        $tipoDeComprobante = (int) $tipoDeComprobanteRaw;
+
+        $ultimoNumero = $this->obtenerUltimoNumeroComprobante($puntoDeVenta, $tipoDeComprobante);
+        $proximoNumero = $ultimoNumero + 1;
+
+        $datosComprobante['CbteDesde'] = $proximoNumero;
+        $datosComprobante['CbteHasta'] = $proximoNumero;
+
+        return $this->autorizarComprobante([$datosComprobante]);
     }
 
     /**
