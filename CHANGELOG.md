@@ -5,6 +5,140 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere al [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.1.2] - 2025-04-08
+
+### ✨ Agregado
+
+#### Nuevos Métodos en FacturacionElectronica
+
+Se agregaron 5 nuevos métodos para completar la funcionalidad del Web Service de Facturación Electrónica:
+
+-   **`informarCAEASinMovimiento(int $puntoVenta, int $caea): mixed`**
+
+    -   Informa a AFIP que un CAEA no ha tenido movimiento en un punto de venta específico
+    -   Obligatorio para evitar observaciones por CAEAs no utilizados
+    -   Debe informarse antes del vencimiento del CAEA
+    -   Solo se puede informar una vez por CAEA y punto de venta
+
+-   **`consultarCAEASinMovimiento(int $puntoVenta, int $caea): mixed`**
+
+    -   Consulta si un CAEA fue previamente informado como "sin movimiento"
+    -   Útil para verificar estado antes de informar
+    -   Evita errores por informar duplicadamente el mismo CAEA
+    -   Incluye fecha de cuando fue informado
+
+-   **`registrarComprobantesConCAEA(array $comprobantes): mixed`**
+
+    -   Informa los comprobantes emitidos con un CAEA ya otorgado
+    -   Proceso de facturación diferida con CAEA
+    -   Debe registrarse dentro del plazo establecido por AFIP
+    -   Soporta múltiples comprobantes en una sola operación
+
+-   **`obtenerCotizacionMoneda(string $monedaId): mixed`**
+
+    -   Obtiene la cotización oficial de una moneda específica según AFIP
+    -   Esencial para facturación en moneda extranjera
+    -   Cotizaciones actualizadas diariamente (días hábiles)
+    -   Incluye fecha de la cotización
+
+-   **`obtenerActividades(): mixed`**
+    -   Obtiene las actividades económicas vigentes del emisor del comprobante
+    -   Útil para validar que se puede facturar para cierta actividad
+    -   Incluye códigos y descripciones de actividades habilitadas
+    -   Información de vigencia por actividad
+
+#### Nuevos Ejemplos Completos
+
+-   **`informar_caea_sin_movimiento.php`** - Ejemplo completo para informar CAEA sin movimiento
+
+    -   Explicación del proceso y cuándo es obligatorio
+    -   Manejo de respuestas y validación de resultados
+    -   Información sobre plazos y restricciones
+
+-   **`consultar_caea_sin_movimiento.php`** - Ejemplo para consultar estado de CAEA sin movimiento
+
+    -   Verificación de estado antes de informar
+    -   Función helper para validación automática
+    -   Manejo de casos donde el CAEA no fue informado
+
+-   **`registrar_comprobantes_con_caea.php`** - Ejemplo completo para registro de comprobantes con CAEA
+
+    -   Proceso completo de facturación diferida
+    -   Validación de vigencia de CAEA antes de registrar
+    -   Manejo de múltiples comprobantes
+    -   Funciones helper para validación de fechas
+
+-   **`obtener_cotizacion_moneda.php`** - Ejemplo para consultar cotizaciones de monedas
+
+    -   Consulta de múltiples monedas (DOL, EUR, BRL, PES)
+    -   Funciones helper para conversión de importes
+    -   Ejemplo de uso en facturación con moneda extranjera
+    -   Cálculos automáticos y formateo de fechas
+
+-   **`obtener_actividades.php`** - Ejemplo para consultar actividades económicas
+    -   Lista completa de actividades del emisor
+    -   Funciones helper para búsqueda y filtrado
+    -   Validación de vigencia de actividades
+    -   Estadísticas por sector económico
+
+#### Tests Expandidos
+
+-   **5 nuevos tests** para los métodos agregados con cobertura completa
+-   Tests de validación de parámetros y respuestas
+-   Simulación de casos de éxito y error
+-   Verificación de estructura de datos
+
+### 🔧 Mejorado
+
+#### Cobertura Completa
+
+-   **22/22 métodos** de FacturacionElectronica ahora tienen ejemplos específicos
+-   **24 ejemplos totales** cubriendo 100% de la funcionalidad disponible
+-   **Documentación actualizada** con información de todos los métodos
+-   **README de ejemplos** actualizado con nueva estructura
+
+#### Funcionalidad CAEA Completa
+
+-   Gestión completa del ciclo de vida de CAEA
+-   Desde solicitud hasta registro de comprobantes
+-   Manejo de casos sin movimiento
+-   Validaciones y controles de fechas
+
+#### Mejoras en Documentación
+
+-   **README principal** actualizado con información de nuevos métodos
+-   **CHANGELOG** con documentación detallada de cambios
+-   **Ejemplos** con explicaciones paso a paso
+-   **Funciones helper** reutilizables en todos los ejemplos
+
+### 📊 Estadísticas Actuales
+
+-   **104 tests** pasando exitosamente con **320+ assertions**
+-   **39 tests específicos** para FacturacionElectronica
+-   **24 ejemplos** cubriendo 100% de los 22 métodos públicos
+-   **0 errores** en análisis estático con PHPStan
+
+### 🛠️ Casos de Uso Cubiertos
+
+#### Gestión CAEA Completa
+
+-   Solicitar CAEA para períodos específicos
+-   Consultar estado y vigencia de CAEA
+-   Informar CAEA sin movimiento cuando corresponde
+-   Registrar comprobantes emitidos con CAEA
+
+#### Facturación en Moneda Extranjera
+
+-   Obtener cotizaciones oficiales de AFIP
+-   Convertir importes automáticamente
+-   Validar cotizaciones para comprobantes
+
+#### Validación de Actividades
+
+-   Verificar actividades habilitadas para facturar
+-   Filtrar por sector económico
+-   Validar vigencia de actividades
+
 ## [1.1.1] - 2025-04-08
 
 ### ✨ Agregado
