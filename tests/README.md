@@ -19,6 +19,8 @@ tests/
 │   │   ├── AfipExceptionTest.php
 │   │   ├── ConfiguracionExceptionTest.php
 │   │   └── ValidacionExceptionTest.php
+│   ├── WebService/
+│   │   └── FacturacionElectronicaTest.php  # 34 tests con cobertura 100%
 │   └── AfipTest.php
 ├── Pest.php           # Configuración de Pest
 ├── TestCase.php       # Clase base para tests
@@ -70,12 +72,21 @@ Los tests cubren las siguientes áreas:
 -   **TokenAuthorization**: Manejo de tokens y firmas
 -   **Excepciones**: Todas las excepciones personalizadas
 -   **Enums**: CodigosError con sus métodos
+-   **FacturacionElectronica**: 34 tests con cobertura 100% de métodos públicos
 
 ### Tests de Integración
 
 -   **AfipIntegration**: Configuración completa, diferentes formatos de CUIT
 -   **ErrorHandling**: Manejo de errores y excepciones con contexto
 -   **WebServiceAccess**: Acceso a web services y validaciones
+
+### Estadísticas Actuales
+
+-   ✅ **99 tests** ejecutándose exitosamente
+-   ✅ **295 assertions** validando comportamiento
+-   ✅ **100% cobertura** de métodos públicos de FacturacionElectronica
+-   ✅ **0 warnings** en todos los tests
+-   ✅ Tests de casos de uso reales basados en ejemplos
 
 ## Helpers de Testing
 
