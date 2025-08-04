@@ -215,7 +215,11 @@ class FacturacionElectronica extends AfipWebService
         try {
             $resultado = $this->ejecutarSolicitud('FECompConsultar', $params);
 
-            return $resultado->FECompConsultarResult->ResultGet;
+            if (is_object($resultado) && isset($resultado->FECompConsultarResult) && is_object($resultado->FECompConsultarResult) && isset($resultado->FECompConsultarResult->ResultGet)) {
+                return $resultado->FECompConsultarResult->ResultGet;
+            }
+
+            return null;
         } catch (SoapException $soapException) {
             if ($soapException->getCode() === 602) {
                 return null;
@@ -496,6 +500,146 @@ class FacturacionElectronica extends AfipWebService
         ];
 
         return $this->ejecutarSolicitud('FEParamGetCondicionIvaReceptor', $params);
+    }
+
+    /**
+     * Informa que un CAEA no ha tenido movimiento en un punto de venta y periodo dados.
+     *
+     * @param  int  $puntoVenta  El punto de venta.
+     * @param  int  $caea  El Código de Autorización Electrónico Anticipado (CAEA).
+     * @return mixed La respuesta del servidor.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function informarCAEASinMovimiento(int $puntoVenta, int $caea): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+            'PtoVta' => $puntoVenta,
+            'CAEA' => $caea,
+        ];
+
+        return $this->ejecutarSolicitud('FECAEASinMovimientoInformar', $params);
+    }
+
+    /**
+     * Consulta si un CAEA fue informado como "sin movimiento" para un punto de venta.
+     *
+     * @param  int  $puntoVenta  El punto de venta.
+     * @param  int  $caea  El Código de Autorización Electrónico Anticipado (CAEA).
+     * @return mixed La respuesta del servidor con el estado de la consulta.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function consultarCAEASinMovimiento(int $puntoVenta, int $caea): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+            'PtoVta' => $puntoVenta,
+            'CAEA' => $caea,
+        ];
+
+        return $this->ejecutarSolicitud('FECAEASinMovimientoConsultar', $params);
+    }
+
+    /**
+     * Informa los comprobantes emitidos con un CAEA ya otorgado.
+     *
+     * @param  array<array<string, mixed>>  $comprobantes  Array de comprobantes a informar.
+     * @return mixed La respuesta del servidor con el resultado del registro.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function registrarComprobantesConCAEA(array $comprobantes): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $primerComprobante = $comprobantes[0] ?? [];
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+            'FeCAEAReg' => [
+                'FeCabReq' => [
+                    'CAEA' => $primerComprobante['CAEA'] ?? '',
+                    'PtoVta' => $primerComprobante['PtoVta'] ?? 1,
+                ],
+                'FeDetReq' => $comprobantes,
+            ],
+        ];
+
+        return $this->ejecutarSolicitud('FECAEARegInformativo', $params);
+    }
+
+    /**
+     * Obtiene la cotización de una moneda específica.
+     *
+     * @param  string  $monedaId  El código de la moneda (ej. 'DOL').
+     * @return mixed La respuesta del servidor con la cotización de la moneda.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerCotizacionMoneda(string $monedaId): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+            'MonId' => $monedaId,
+        ];
+
+        return $this->ejecutarSolicitud('FEParamGetCotizacion', $params);
+    }
+
+    /**
+     * Obtiene las actividades económicas vigentes del emisor del comprobante.
+     *
+     * @return mixed La respuesta del servidor con la lista de actividades.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerActividades(): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+        ];
+
+        return $this->ejecutarSolicitud('FEParamGetActividades', $params);
     }
 
     /**
