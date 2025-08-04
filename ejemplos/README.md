@@ -1,6 +1,14 @@
 # Ejemplos de PhpAfipWs
 
-Esta carpeta contiene ejemplos prácticos de uso del SDK PhpAfipWs para diferentes tipos de comprobantes y operaciones.
+Esta carpeta contiene **19 ejemplos prácticos** que cubren **100% de los métodos** disponibles del SDK PhpAfipWs para diferentes tipos de comprobantes y operaciones.
+
+## ✨ Características de los Ejemplos
+
+-   ✅ **Cobertura completa**: 17/17 métodos públicos de FacturacionElectronica
+-   ✅ **Sin warnings**: Todos los ejemplos ejecutan sin errores
+-   ✅ **Código educativo**: Explicaciones detalladas y mejores prácticas
+-   ✅ **Funciones helper**: Código reutilizable incluido
+-   ✅ **Casos reales**: Basados en situaciones de uso común
 
 ## 🆕 Nuevos métodos v1.1.0
 
@@ -30,10 +38,21 @@ Los ejemplos han sido actualizados para mostrar los nuevos métodos simplificado
 -   **`obtener_tipos_documento.php`** - Consultar tipos de documentos
 -   **`obtener_tipos_moneda.php`** - Consultar tipos de monedas
 -   **`obtener_condiciones_iva_receptor.php`** - Consultar condiciones de IVA
+-   **`obtener_puntos_venta.php`** - ✅ Consultar puntos de venta habilitados
+-   **`obtener_tipos_concepto.php`** - ✅ Consultar tipos de concepto
+-   **`obtener_tipos_alicuota.php`** - ✅ Consultar alícuotas de IVA
+-   **`obtener_tipos_opcional.php`** - ✅ Consultar tipos de datos opcionales
+-   **`obtener_tipos_tributo.php`** - ✅ Consultar tipos de tributos
+-   **`consultar_comprobante.php`** - ✅ Consultar información de comprobante específico
 
 ### Nuevos métodos
 
 -   **`nuevos_metodos_v1_1.php`** - Demostración completa de los nuevos métodos
+-   **`demo_completa_metodos.php`** - ✅ Demostración de TODOS los métodos disponibles
+
+### CAEA (Código de Autorización Electrónico Anticipado)
+
+-   **`gestion_caea.php`** - ✅ Gestión completa de CAEA (solicitar y consultar)
 
 ## 🚀 Configuración inicial
 
@@ -121,8 +140,22 @@ php ejemplos/factura_A.php
 # Ver demostración de nuevos métodos
 php ejemplos/nuevos_metodos_v1_1.php
 
+# Ver demostración completa de TODOS los métodos
+php ejemplos/demo_completa_metodos.php
+
 # Verificar estado del servidor
 php ejemplos/estado_servidor.php
+
+# Consultar parámetros específicos
+php ejemplos/obtener_puntos_venta.php
+php ejemplos/obtener_tipos_concepto.php
+php ejemplos/obtener_tipos_alicuota.php
+
+# Consultar comprobantes
+php ejemplos/consultar_comprobante.php
+
+# Gestión de CAEA
+php ejemplos/gestion_caea.php
 ```
 
 ## ⚠️ Notas importantes
@@ -137,6 +170,39 @@ php ejemplos/estado_servidor.php
 -   [README principal](../README.md)
 -   [CHANGELOG](../CHANGELOG.md)
 -   [Documentación de AFIP](https://www.afip.gob.ar/ws/)
+
+## 📊 Estadísticas de Cobertura
+
+### Métodos de FacturacionElectronica Cubiertos: 17/17 (100%)
+
+| Método                             | Ejemplo Específico                                | Estado |
+| ---------------------------------- | ------------------------------------------------- | ------ |
+| `obtenerEstadoServidor()`          | `estado_servidor.php`                             | ✅     |
+| `obtenerUltimoComprobante()`       | `nuevos_metodos_v1_1.php`                         | ✅     |
+| `obtenerUltimoNumeroComprobante()` | `nuevos_metodos_v1_1.php`                         | ✅     |
+| `autorizarComprobante()`           | `factura_A.php`, `factura_B.php`, `factura_C.php` | ✅     |
+| `autorizarProximoComprobante()`    | `factura_A.php`, `nuevos_metodos_v1_1.php`        | ✅     |
+| `obtenerInformacionComprobante()`  | `consultar_comprobante.php`                       | ✅     |
+| `crearCAEA()`                      | `gestion_caea.php`                                | ✅     |
+| `obtenerCAEA()`                    | `gestion_caea.php`                                | ✅     |
+| `obtenerPuntosDeVenta()`           | `obtener_puntos_venta.php`                        | ✅     |
+| `obtenerTiposComprobante()`        | `obtener_tipos_comprobantes.php`                  | ✅     |
+| `obtenerTiposConcepto()`           | `obtener_tipos_concepto.php`                      | ✅     |
+| `obtenerTiposDocumento()`          | `obtener_tipos_documento.php`                     | ✅     |
+| `obtenerTiposAlicuota()`           | `obtener_tipos_alicuota.php`                      | ✅     |
+| `obtenerTiposMoneda()`             | `obtener_tipos_moneda.php`                        | ✅     |
+| `obtenerTiposOpcional()`           | `obtener_tipos_opcional.php`                      | ✅     |
+| `obtenerTiposTributo()`            | `obtener_tipos_tributo.php`                       | ✅     |
+| `obtenerCondicionesIvaReceptor()`  | `obtener_condiciones_iva_receptor.php`            | ✅     |
+
+### Resumen por Categoría
+
+-   **Facturación**: 6 ejemplos (A, B, C + Notas de Crédito)
+-   **Consultas de Parámetros**: 8 ejemplos (tipos, alícuotas, etc.)
+-   **Gestión Avanzada**: 3 ejemplos (CAEA, consultas, estado)
+-   **Demostración**: 2 ejemplos (métodos nuevos, demo completa)
+
+**Total: 19 ejemplos cubriendo 100% de la funcionalidad**
 
 ## 🤝 Contribuir
 
