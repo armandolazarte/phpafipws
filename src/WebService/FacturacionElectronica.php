@@ -181,6 +181,132 @@ class FacturacionElectronica extends AfipWebService
     }
 
     /**
+     * Obtiene la información completa de un comprobante autorizado.
+     *
+     * Consulta el Web Service de AFIP para recuperar todos los datos de un
+     * comprobante específico, incluyendo su CAE y otros detalles.
+     *
+     * @param  int  $numero  El número del comprobante a consultar.
+     * @param  int  $puntoVenta  El punto de venta del comprobante.
+     * @param  int  $tipoComprobante  El tipo de comprobante.
+     * @return mixed La respuesta del servidor con los detalles del comprobante, o null si no se encuentra.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerInformacionComprobante(int $numero, int $puntoVenta, int $tipoComprobante): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+            'FeCompConsReq' => [
+                'CbteNro' => $numero,
+                'PtoVta' => $puntoVenta,
+                'CbteTipo' => $tipoComprobante,
+            ],
+        ];
+
+        try {
+            $resultado = $this->ejecutarSolicitud('FECompConsultar', $params);
+
+            return $resultado->FECompConsultarResult->ResultGet;
+        } catch (SoapException $soapException) {
+            if ($soapException->getCode() === 602) {
+                return null;
+            }
+
+            throw $soapException;
+        }
+    }
+
+    /**
+     * Solicita un Código de Autorización Electrónico Anticipado (CAEA).
+     *
+     * Este método se utiliza para obtener un CAEA, que permite la facturación
+     * de un gran volumen de comprobantes de forma diferida.
+     *
+     * @param  int  $periodo  El período para el cual se solicita el CAEA (formato AAAA-MM).
+     * @param  int  $orden  El orden del CAEA dentro del período (1 o 2).
+     * @return mixed La respuesta del servidor con el CAEA asignado.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function crearCAEA(int $periodo, int $orden): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+            'Periodo' => $periodo,
+            'Orden' => $orden,
+        ];
+
+        return $this->ejecutarSolicitud('FECAEASolicitar', $params);
+    }
+
+    /**
+     * Consulta el estado de un Código de Autorización Electrónico Anticipado (CAEA).
+     *
+     * @param  int  $caea  El número del CAEA a consultar.
+     * @return mixed La respuesta del servidor con el estado del CAEA.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerCAEA(int $caea): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+            'CAEA' => $caea,
+        ];
+
+        return $this->ejecutarSolicitud('FECAEAConsultar', $params);
+    }
+
+    /**
+     * Obtiene una lista de los puntos de venta habilitados.
+     *
+     * @return mixed La respuesta del servidor con la lista de puntos de venta.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerPuntosDeVenta(): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+        ];
+
+        return $this->ejecutarSolicitud('FEParamGetPtosVenta', $params);
+    }
+
+    /**
      * Obtiene los tipos de comprobantes disponibles en el servicio.
      *
      * @return mixed La respuesta del servidor con el listado de tipos de comprobantes disponibles.
@@ -202,6 +328,30 @@ class FacturacionElectronica extends AfipWebService
         ];
 
         return $this->ejecutarSolicitud('FEParamGetTiposCbte', $params);
+    }
+
+    /**
+     * Obtiene los tipos de conceptos disponibles para los comprobantes.
+     *
+     * @return mixed La respuesta del servidor con la lista de tipos de conceptos.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerTiposConcepto(): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+        ];
+
+        return $this->ejecutarSolicitud('FEParamGetTiposConcepto', $params);
     }
 
     /**
@@ -229,6 +379,30 @@ class FacturacionElectronica extends AfipWebService
     }
 
     /**
+     * Obtiene los tipos de alícuotas de IVA disponibles.
+     *
+     * @return mixed La respuesta del servidor con la lista de alícuotas de IVA.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerTiposAlicuota(): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+        ];
+
+        return $this->ejecutarSolicitud('FEParamGetTiposIva', $params);
+    }
+
+    /**
      * Obtiene los tipos de monedas disponibles en el servicio.
      *
      * @return mixed La respuesta del servidor con el listado de tipos de monedas disponibles.
@@ -250,6 +424,54 @@ class FacturacionElectronica extends AfipWebService
         ];
 
         return $this->ejecutarSolicitud('FEParamGetTiposMonedas', $params);
+    }
+
+    /**
+     * Obtiene los tipos de datos opcionales para los comprobantes.
+     *
+     * @return mixed La respuesta del servidor con la lista de tipos opcionales.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerTiposOpcional(): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+        ];
+
+        return $this->ejecutarSolicitud('FEParamGetTiposOpcional', $params);
+    }
+
+    /**
+     * Obtiene los tipos de tributos disponibles para los comprobantes.
+     *
+     * @return mixed La respuesta del servidor con la lista de tipos de tributos.
+     *
+     * @throws AutenticacionException Si ocurre un error durante la autenticación.
+     * @throws SoapException Si ocurre un error en la comunicación SOAP.
+     * @throws WebServiceException Si hay un problema general con el servicio.
+     */
+    public function obtenerTiposTributo(): mixed
+    {
+        $tokenAutorizacion = $this->obtenerTokenAutorizacion();
+
+        $params = [
+            'Auth' => [
+                'Token' => $tokenAutorizacion->obtenerToken(),
+                'Sign' => $tokenAutorizacion->obtenerFirma(),
+                'Cuit' => $this->afip->obtenerCuit(),
+            ],
+        ];
+
+        return $this->ejecutarSolicitud('FEParamGetTiposTributos', $params);
     }
 
     /**
