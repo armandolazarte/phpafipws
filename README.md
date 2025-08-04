@@ -27,14 +27,18 @@ PhpAfipWs es un SDK moderno y robusto para interactuar con los Web Services de A
 -   **Confiable**: 99 tests automatizados con Pest 4
 -   **Mantenido**: Actualizaciones regulares y soporte activo
 
-### 🆕 Novedades v1.1.1
+### 🆕 Novedades v1.1.2
 
--   **Ejemplos completos**: 19 ejemplos prácticos cubriendo 100% de los métodos disponibles
--   **Cobertura total**: Todos los 17 métodos públicos de FacturacionElectronica tienen ejemplos específicos
--   **Sin warnings**: Todos los ejemplos ejecutan sin errores de PHP
--   **Tests robustos**: 99 tests con 295 assertions, incluyendo 34 tests específicos para FacturacionElectronica
--   **Funciones helper**: Código reutilizable incluido en ejemplos
--   **Casos reales**: Ejemplos basados en situaciones de uso común
+-   **Nuevos métodos CAEA**: 3 métodos adicionales para gestión completa de CAEA
+    -   `informarCAEASinMovimiento()` - Informar CAEA sin movimiento
+    -   `consultarCAEASinMovimiento()` - Consultar estado de CAEA sin movimiento
+    -   `registrarComprobantesConCAEA()` - Registrar comprobantes emitidos con CAEA
+-   **Nuevos métodos de consulta**: 2 métodos para información adicional
+    -   `obtenerCotizacionMoneda()` - Obtener cotización oficial de monedas
+    -   `obtenerActividades()` - Consultar actividades económicas del emisor
+-   **Ejemplos ampliados**: 24 ejemplos prácticos cubriendo 100% de los 22 métodos disponibles
+-   **Tests actualizados**: Suite de tests expandida con cobertura completa de nuevos métodos
+-   **Documentación completa**: Guías detalladas y casos de uso para todos los métodos
 
 ## 🚀 Instalación
 
@@ -182,7 +186,7 @@ if ($respuesta->FECAESolicitarResult->FeDetResp->FECAEDetResponse->Resultado ===
 
 ## 📚 Ejemplos
 
-El directorio `ejemplos/` contiene **19 ejemplos completos** que cubren **100% de los métodos** disponibles:
+El directorio `ejemplos/` contiene **24 ejemplos completos** que cubren **100% de los métodos** disponibles:
 
 ### Facturación Electrónica
 
@@ -202,9 +206,12 @@ El directorio `ejemplos/` contiene **19 ejemplos completos** que cubren **100% d
 
 ### Métodos Avanzados
 
--   Nuevos métodos simplificados v1.1.0
--   Estado del servidor y diagnósticos
--   Demostración completa de todos los métodos
+-   **Gestión CAEA completa**: Solicitar, consultar, informar sin movimiento y registrar comprobantes
+-   **Cotizaciones de moneda**: Obtener cotizaciones oficiales de AFIP para facturación en moneda extranjera
+-   **Actividades económicas**: Consultar actividades habilitadas del emisor
+-   **Nuevos métodos simplificados v1.1.0**: Autorización automática y consultas directas
+-   **Estado del servidor y diagnósticos**: Verificación de disponibilidad de servicios
+-   **Demostración completa**: Ejemplos de todos los métodos disponibles
 
 Todos los ejemplos incluyen:
 
