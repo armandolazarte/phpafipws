@@ -1,10 +1,10 @@
 # Ejemplos de PhpAfipWs
 
-Esta carpeta contiene **19 ejemplos prácticos** que cubren **100% de los métodos** disponibles del SDK PhpAfipWs para diferentes tipos de comprobantes y operaciones.
+Esta carpeta contiene **24 ejemplos prácticos** que cubren **100% de los métodos** disponibles del SDK PhpAfipWs para diferentes tipos de comprobantes y operaciones.
 
 ## ✨ Características de los Ejemplos
 
--   ✅ **Cobertura completa**: 17/17 métodos públicos de FacturacionElectronica
+-   ✅ **Cobertura completa**: 22/22 métodos públicos de FacturacionElectronica
 -   ✅ **Sin warnings**: Todos los ejemplos ejecutan sin errores
 -   ✅ **Código educativo**: Explicaciones detalladas y mejores prácticas
 -   ✅ **Funciones helper**: Código reutilizable incluido
@@ -53,6 +53,14 @@ Los ejemplos han sido actualizados para mostrar los nuevos métodos simplificado
 ### CAEA (Código de Autorización Electrónico Anticipado)
 
 -   **`gestion_caea.php`** - ✅ Gestión completa de CAEA (solicitar y consultar)
+-   **`informar_caea_sin_movimiento.php`** - ✅ Informar CAEA sin movimiento
+-   **`consultar_caea_sin_movimiento.php`** - ✅ Consultar estado de CAEA sin movimiento
+-   **`registrar_comprobantes_con_caea.php`** - ✅ Registrar comprobantes emitidos con CAEA
+
+### Nuevos métodos v1.1.2
+
+-   **`obtener_cotizacion_moneda.php`** - ✅ Obtener cotización oficial de monedas
+-   **`obtener_actividades.php`** - ✅ Consultar actividades económicas del emisor
 
 ## 🚀 Configuración inicial
 
@@ -150,12 +158,17 @@ php ejemplos/estado_servidor.php
 php ejemplos/obtener_puntos_venta.php
 php ejemplos/obtener_tipos_concepto.php
 php ejemplos/obtener_tipos_alicuota.php
+php ejemplos/obtener_cotizacion_moneda.php
+php ejemplos/obtener_actividades.php
 
 # Consultar comprobantes
 php ejemplos/consultar_comprobante.php
 
 # Gestión de CAEA
 php ejemplos/gestion_caea.php
+php ejemplos/informar_caea_sin_movimiento.php
+php ejemplos/consultar_caea_sin_movimiento.php
+php ejemplos/registrar_comprobantes_con_caea.php
 ```
 
 ## ⚠️ Notas importantes
@@ -173,7 +186,7 @@ php ejemplos/gestion_caea.php
 
 ## 📊 Estadísticas de Cobertura
 
-### Métodos de FacturacionElectronica Cubiertos: 17/17 (100%)
+### Métodos de FacturacionElectronica Cubiertos: 22/22 (100%)
 
 | Método                             | Ejemplo Específico                                | Estado |
 | ---------------------------------- | ------------------------------------------------- | ------ |
@@ -185,6 +198,11 @@ php ejemplos/gestion_caea.php
 | `obtenerInformacionComprobante()`  | `consultar_comprobante.php`                       | ✅     |
 | `crearCAEA()`                      | `gestion_caea.php`                                | ✅     |
 | `obtenerCAEA()`                    | `gestion_caea.php`                                | ✅     |
+| `informarCAEASinMovimiento()`      | `informar_caea_sin_movimiento.php`                | ✅     |
+| `consultarCAEASinMovimiento()`     | `consultar_caea_sin_movimiento.php`               | ✅     |
+| `registrarComprobantesConCAEA()`   | `registrar_comprobantes_con_caea.php`             | ✅     |
+| `obtenerCotizacionMoneda()`        | `obtener_cotizacion_moneda.php`                   | ✅     |
+| `obtenerActividades()`             | `obtener_actividades.php`                         | ✅     |
 | `obtenerPuntosDeVenta()`           | `obtener_puntos_venta.php`                        | ✅     |
 | `obtenerTiposComprobante()`        | `obtener_tipos_comprobantes.php`                  | ✅     |
 | `obtenerTiposConcepto()`           | `obtener_tipos_concepto.php`                      | ✅     |
@@ -198,11 +216,11 @@ php ejemplos/gestion_caea.php
 ### Resumen por Categoría
 
 -   **Facturación**: 6 ejemplos (A, B, C + Notas de Crédito)
--   **Consultas de Parámetros**: 8 ejemplos (tipos, alícuotas, etc.)
--   **Gestión Avanzada**: 3 ejemplos (CAEA, consultas, estado)
+-   **Consultas de Parámetros**: 10 ejemplos (tipos, alícuotas, cotizaciones, actividades, etc.)
+-   **Gestión Avanzada**: 6 ejemplos (CAEA completo, consultas, estado)
 -   **Demostración**: 2 ejemplos (métodos nuevos, demo completa)
 
-**Total: 19 ejemplos cubriendo 100% de la funcionalidad**
+**Total: 24 ejemplos cubriendo 100% de la funcionalidad**
 
 ## 🤝 Contribuir
 
