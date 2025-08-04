@@ -8,7 +8,7 @@
 [![Version](https://img.shields.io/packagist/v/armandolazarte/phpafipws)](https://packagist.org/packages/armandolazarte/phpafipws)
 [![License](https://img.shields.io/packagist/l/armandolazarte/phpafipws)](https://packagist.org/packages/armandolazarte/phpafipws)
 [![PHP Version](https://img.shields.io/packagist/php-v/armandolazarte/phpafipws)](https://packagist.org/packages/armandolazarte/phpafipws)
-[![Test Coverage](https://img.shields.io/badge/tests-79%20passing-brightgreen)](https://github.com/armandolazarte/phpafipws)
+[![Test Coverage](https://img.shields.io/badge/tests-99%20passing-brightgreen)](https://github.com/armandolazarte/phpafipws)
 
 </div>
 
@@ -24,16 +24,17 @@ PhpAfipWs es un SDK moderno y robusto para interactuar con los Web Services de A
 -   **Fácil de usar**: API intuitiva y bien documentada
 -   **Completo**: Soporte para múltiples Web Services de AFIP
 -   **Seguro**: Manejo robusto de certificados y autenticación
--   **Confiable**: 79+ tests automatizados con Pest 4
+-   **Confiable**: 99 tests automatizados con Pest 4
 -   **Mantenido**: Actualizaciones regulares y soporte activo
 
-### 🆕 Novedades v1.1.0
+### 🆕 Novedades v1.1.1
 
--   **Método simplificado**: `autorizarProximoComprobante()` calcula automáticamente el próximo número
--   **Extracción directa**: `obtenerUltimoNumeroComprobante()` devuelve directamente el número como entero
--   **Validación robusta**: Validación de tipos y estructura de respuestas mejorada
--   **Manejo de errores**: Excepciones específicas con mensajes descriptivos
--   **Tests completos**: Cobertura total de los nuevos métodos con 14 tests adicionales
+-   **Ejemplos completos**: 19 ejemplos prácticos cubriendo 100% de los métodos disponibles
+-   **Cobertura total**: Todos los 17 métodos públicos de FacturacionElectronica tienen ejemplos específicos
+-   **Sin warnings**: Todos los ejemplos ejecutan sin errores de PHP
+-   **Tests robustos**: 99 tests con 295 assertions, incluyendo 34 tests específicos para FacturacionElectronica
+-   **Funciones helper**: Código reutilizable incluido en ejemplos
+-   **Casos reales**: Ejemplos basados en situaciones de uso común
 
 ## 🚀 Instalación
 
@@ -181,14 +182,37 @@ if ($respuesta->FECAESolicitarResult->FeDetResp->FECAEDetResponse->Resultado ===
 
 ## 📚 Ejemplos
 
-El directorio `ejemplos/` contiene ejemplos completos para:
+El directorio `ejemplos/` contiene **19 ejemplos completos** que cubren **100% de los métodos** disponibles:
 
--   Facturación A, B y C
--   Notas de crédito
--   Consulta de tipos de comprobantes
--   Consulta de tipos de documento
--   Consulta de condiciones IVA
--   Estado del servidor
+### Facturación Electrónica
+
+-   Facturas A, B y C con ejemplos detallados
+-   Notas de crédito A, B y C
+-   Gestión completa de CAEA (Código de Autorización Electrónico Anticipado)
+-   Consulta de información de comprobantes
+
+### Consultas de Parámetros
+
+-   Tipos de comprobantes, documentos y monedas
+-   Tipos de concepto y alícuotas de IVA
+-   Condiciones de IVA del receptor
+-   Puntos de venta habilitados
+-   **Tipos de datos opcionales** (CVU, CBU, Email, etc.)
+-   **Tipos de tributos** (Nacionales, Provinciales, Municipales)
+
+### Métodos Avanzados
+
+-   Nuevos métodos simplificados v1.1.0
+-   Estado del servidor y diagnósticos
+-   Demostración completa de todos los métodos
+
+Todos los ejemplos incluyen:
+
+-   ✅ Código funcional sin warnings
+-   ✅ Explicaciones detalladas de uso
+-   ✅ Validaciones y mejores prácticas
+-   ✅ Funciones helper reutilizables
+-   ✅ Manejo robusto de errores
 
 ## 🔍 Métodos Útiles
 
@@ -327,12 +351,14 @@ composer test:unit
 
 ### Cobertura de Tests
 
--   ✅ **79 tests** con **212 assertions**
+-   ✅ **99 tests** con **295 assertions**
 -   ✅ Tests unitarios para todas las clases principales
 -   ✅ Tests de integración para flujos completos
 -   ✅ Validación de configuraciones y excepciones
 -   ✅ Manejo de errores y casos edge
--   ✅ Cobertura completa de métodos de Facturación Electrónica
+-   ✅ **Cobertura 100%** de métodos de Facturación Electrónica
+-   ✅ **34 tests específicos** para FacturacionElectronica con 111 assertions
+-   ✅ Tests de casos de uso reales basados en ejemplos
 
 ### Estructura de Tests
 
