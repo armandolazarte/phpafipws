@@ -531,6 +531,103 @@ describe('FacturacionElectronica', function (): void {
             expect($resultado)->toBeObject();
             expect($resultado->FECAEAConsultarResult->CAEA)->toBe(21234567890123);
         });
+
+        it('puede informar CAEA sin movimiento', function (): void {
+            $facturacionElectronicaStub = new class($this->afip) extends FacturacionElectronica
+            {
+                public function informarCAEASinMovimiento(int $puntoVenta, int $caea): mixed
+                {
+                    expect($puntoVenta)->toBe(1);
+                    expect($caea)->toBe(21234567890123);
+
+                    return (object) [
+                        'FECAEASinMovimientoInformarResult' => (object) [
+                            'CAEA' => $caea,
+                            'PtoVta' => $puntoVenta,
+                            'Resultado' => 'A',
+                            'FchProceso' => '20241201',
+                        ],
+                    ];
+                }
+            };
+
+            $resultado = $facturacionElectronicaStub->informarCAEASinMovimiento(1, 21234567890123);
+
+            expect($resultado)->toBeObject();
+            expect($resultado->FECAEASinMovimientoInformarResult->CAEA)->toBe(21234567890123);
+            expect($resultado->FECAEASinMovimientoInformarResult->PtoVta)->toBe(1);
+        });
+
+        it('puede consultar CAEA sin movimiento', function (): void {
+            $facturacionElectronicaStub = new class($this->afip) extends FacturacionElectronica
+            {
+                public function consultarCAEASinMovimiento(int $puntoVenta, int $caea): mixed
+                {
+                    expect($puntoVenta)->toBe(1);
+                    expect($caea)->toBe(21234567890123);
+
+                    return (object) [
+                        'FECAEASinMovimientoConsultarResult' => (object) [
+                            'CAEA' => $caea,
+                            'PtoVta' => $puntoVenta,
+                            'FchInformado' => '20241201',
+                            'Resultado' => 'A',
+                        ],
+                    ];
+                }
+            };
+
+            $resultado = $facturacionElectronicaStub->consultarCAEASinMovimiento(1, 21234567890123);
+
+            expect($resultado)->toBeObject();
+            expect($resultado->FECAEASinMovimientoConsultarResult->CAEA)->toBe(21234567890123);
+            expect($resultado->FECAEASinMovimientoConsultarResult->PtoVta)->toBe(1);
+        });
+
+        it('puede registrar comprobantes con CAEA', function (): void {
+            $facturacionElectronicaStub = new class($this->afip) extends FacturacionElectronica
+            {
+                public function registrarComprobantesConCAEA(array $comprobantes): mixed
+                {
+                    expect($comprobantes)->toBeArray();
+                    expect($comprobantes[0]['CAEA'])->toBe('21234567890123');
+                    expect($comprobantes[0]['PtoVta'])->toBe(1);
+
+                    return (object) [
+                        'FECAEARegInformativoResult' => (object) [
+                            'FeCabResp' => (object) [
+                                'CAEA' => '21234567890123',
+                                'PtoVta' => 1,
+                                'Resultado' => 'A',
+                            ],
+                            'FeDetResp' => [
+                                (object) [
+                                    'CbteDesde' => 1,
+                                    'CbteHasta' => 1,
+                                    'Resultado' => 'A',
+                                ],
+                            ],
+                        ],
+                    ];
+                }
+            };
+
+            $comprobantes = [
+                [
+                    'CAEA' => '21234567890123',
+                    'PtoVta' => 1,
+                    'CbteTipo' => 1,
+                    'CbteDesde' => 1,
+                    'CbteHasta' => 1,
+                    'ImpTotal' => 121.00,
+                ],
+            ];
+
+            $resultado = $facturacionElectronicaStub->registrarComprobantesConCAEA($comprobantes);
+
+            expect($resultado)->toBeObject();
+            expect($resultado->FECAEARegInformativoResult->FeCabResp->CAEA)->toBe('21234567890123');
+        });
     });
 
     describe('métodos adicionales de consulta', function (): void {
@@ -662,6 +759,60 @@ describe('FacturacionElectronica', function (): void {
 
             expect($resultado)->toBeObject();
             expect($resultado->FEParamGetTiposTributosResult)->toBeArray();
+        });
+
+        it('puede obtener cotización de moneda', function (): void {
+            $facturacionElectronicaStub = new class($this->afip) extends FacturacionElectronica
+            {
+                public function obtenerCotizacionMoneda(string $monedaId): mixed
+                {
+                    expect($monedaId)->toBe('DOL');
+
+                    return (object) [
+                        'FEParamGetCotizacionResult' => (object) [
+                            'MonId' => 'DOL',
+                            'MonCotiz' => 1050.50,
+                            'FchCotiz' => '20250408',
+                        ],
+                    ];
+                }
+            };
+
+            $resultado = $facturacionElectronicaStub->obtenerCotizacionMoneda('DOL');
+
+            expect($resultado)->toBeObject();
+            expect($resultado->FEParamGetCotizacionResult->MonId)->toBe('DOL');
+            expect($resultado->FEParamGetCotizacionResult->MonCotiz)->toBe(1050.50);
+        });
+
+        it('puede obtener actividades económicas', function (): void {
+            $facturacionElectronicaStub = new class($this->afip) extends FacturacionElectronica
+            {
+                public function obtenerActividades(): mixed
+                {
+                    return (object) [
+                        'FEParamGetActividadesResult' => [
+                            (object) [
+                                'Id' => 620100,
+                                'Desc' => 'Programación informática',
+                                'Orden' => 1,
+                            ],
+                            (object) [
+                                'Id' => 620200,
+                                'Desc' => 'Consultoría informática',
+                                'Orden' => 2,
+                            ],
+                        ],
+                    ];
+                }
+            };
+
+            $resultado = $facturacionElectronicaStub->obtenerActividades();
+
+            expect($resultado)->toBeObject();
+            expect($resultado->FEParamGetActividadesResult)->toBeArray();
+            expect($resultado->FEParamGetActividadesResult[0]->Id)->toBe(620100);
+            expect($resultado->FEParamGetActividadesResult[0]->Desc)->toBe('Programación informática');
         });
     });
 
