@@ -43,12 +43,13 @@ try {
     if (isset($estadoServidor->FEDummyResult)) {
         $estado = $estadoServidor->FEDummyResult;
         echo "✅ Estado del servidor:\n";
-        echo "   • AppServer: {$estado->AppServer}\n";
-        echo "   • DbServer: {$estado->DbServer}\n";
-        echo "   • AuthServer: {$estado->AuthServer}\n";
+        echo sprintf('   • AppServer: %s%s', $estado->AppServer, PHP_EOL);
+        echo sprintf('   • DbServer: %s%s', $estado->DbServer, PHP_EOL);
+        echo sprintf('   • AuthServer: %s%s', $estado->AuthServer, PHP_EOL);
     } else {
         echo "❌ No se pudo obtener el estado del servidor\n";
     }
+
     echo "\n";
 
     // ========================================
@@ -65,13 +66,15 @@ try {
         if (! is_array($puntos)) {
             $puntos = [$puntos];
         }
+
         echo '✅ Puntos de venta encontrados: '.count($puntos)."\n";
         foreach (array_slice($puntos, 0, 3) as $punto) {
             $id = $punto->Id ?? $punto->Nro ?? 'N/A';
             $desc = $punto->Desc ?? 'Sin descripción';
-            echo "   • PtoVta {$id}: {$desc}\n";
+            echo sprintf('   • PtoVta %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // Tipos de comprobante
@@ -82,14 +85,16 @@ try {
         if (! is_array($tipos)) {
             $tipos = [$tipos];
         }
+
         echo '✅ Tipos de comprobante encontrados: '.count($tipos)."\n";
-        $tiposComunes = array_filter($tipos, fn ($t) => isset($t->Id) && in_array($t->Id, [1, 6, 11, 3, 8, 13]));
+        $tiposComunes = array_filter($tipos, fn ($t): bool => isset($t->Id) && in_array($t->Id, [1, 6, 11, 3, 8, 13]));
         foreach ($tiposComunes as $tipo) {
             $id = $tipo->Id ?? 'N/A';
             $desc = $tipo->Desc ?? 'Sin descripción';
-            echo "   • Tipo {$id}: {$desc}\n";
+            echo sprintf('   • Tipo %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // Tipos de documento
@@ -100,14 +105,16 @@ try {
         if (! is_array($docs)) {
             $docs = [$docs];
         }
+
         echo '✅ Tipos de documento encontrados: '.count($docs)."\n";
-        $docsComunes = array_filter($docs, fn ($d) => isset($d->Id) && in_array($d->Id, [80, 86, 96, 99]));
+        $docsComunes = array_filter($docs, fn ($d): bool => isset($d->Id) && in_array($d->Id, [80, 86, 96, 99]));
         foreach ($docsComunes as $doc) {
             $id = $doc->Id ?? 'N/A';
             $desc = $doc->Desc ?? 'Sin descripción';
-            echo "   • Tipo {$id}: {$desc}\n";
+            echo sprintf('   • Tipo %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // Tipos de moneda
@@ -118,14 +125,16 @@ try {
         if (! is_array($monedas)) {
             $monedas = [$monedas];
         }
+
         echo '✅ Tipos de moneda encontrados: '.count($monedas)."\n";
-        $monedasComunes = array_filter($monedas, fn ($m) => isset($m->Id) && in_array($m->Id, ['PES', 'DOL', 'EUR']));
+        $monedasComunes = array_filter($monedas, fn ($m): bool => isset($m->Id) && in_array($m->Id, ['PES', 'DOL', 'EUR']));
         foreach ($monedasComunes as $moneda) {
             $id = $moneda->Id ?? 'N/A';
             $desc = $moneda->Desc ?? 'Sin descripción';
-            echo "   • {$id}: {$desc}\n";
+            echo sprintf('   • %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // Tipos de concepto
@@ -136,13 +145,15 @@ try {
         if (! is_array($conceptos)) {
             $conceptos = [$conceptos];
         }
+
         echo '✅ Tipos de concepto encontrados: '.count($conceptos)."\n";
         foreach ($conceptos as $concepto) {
             $id = $concepto->Id ?? 'N/A';
             $desc = $concepto->Desc ?? 'Sin descripción';
-            echo "   • Concepto {$id}: {$desc}\n";
+            echo sprintf('   • Concepto %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // Tipos de alícuota IVA
@@ -153,14 +164,16 @@ try {
         if (! is_array($alicuotas)) {
             $alicuotas = [$alicuotas];
         }
+
         echo '✅ Tipos de alícuota encontrados: '.count($alicuotas)."\n";
-        $alicuotasComunes = array_filter($alicuotas, fn ($a) => isset($a->Id) && in_array($a->Id, [3, 4, 5, 6]));
+        $alicuotasComunes = array_filter($alicuotas, fn ($a): bool => isset($a->Id) && in_array($a->Id, [3, 4, 5, 6]));
         foreach ($alicuotasComunes as $alicuota) {
             $id = $alicuota->Id ?? 'N/A';
             $desc = $alicuota->Desc ?? 'Sin descripción';
-            echo "   • ID {$id}: {$desc}\n";
+            echo sprintf('   • ID %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // Condiciones IVA receptor
@@ -171,14 +184,16 @@ try {
         if (! is_array($condiciones)) {
             $condiciones = [$condiciones];
         }
+
         echo '✅ Condiciones IVA encontradas: '.count($condiciones)."\n";
-        $condicionesComunes = array_filter($condiciones, fn ($c) => isset($c->Id) && in_array($c->Id, [1, 4, 5, 6]));
+        $condicionesComunes = array_filter($condiciones, fn ($c): bool => isset($c->Id) && in_array($c->Id, [1, 4, 5, 6]));
         foreach ($condicionesComunes as $condicion) {
             $id = $condicion->Id ?? 'N/A';
             $desc = $condicion->Desc ?? 'Sin descripción';
-            echo "   • ID {$id}: {$desc}\n";
+            echo sprintf('   • ID %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // Tipos opcionales
@@ -189,13 +204,15 @@ try {
         if (! is_array($opcionales)) {
             $opcionales = [$opcionales];
         }
+
         echo '✅ Tipos opcionales encontrados: '.count($opcionales)."\n";
         foreach (array_slice($opcionales, 0, 3) as $opcional) {
             $id = $opcional->Id ?? 'N/A';
             $desc = $opcional->Desc ?? 'Sin descripción';
-            echo "   • ID {$id}: {$desc}\n";
+            echo sprintf('   • ID %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // Tipos de tributo
@@ -206,13 +223,15 @@ try {
         if (! is_array($tributos)) {
             $tributos = [$tributos];
         }
+
         echo '✅ Tipos de tributo encontrados: '.count($tributos)."\n";
         foreach (array_slice($tributos, 0, 3) as $tributo) {
             $id = $tributo->Id ?? 'N/A';
             $desc = $tributo->Desc ?? 'Sin descripción';
-            echo "   • ID {$id}: {$desc}\n";
+            echo sprintf('   • ID %s: %s%s', $id, $desc, PHP_EOL);
         }
     }
+
     echo "\n";
 
     // ========================================
@@ -235,10 +254,11 @@ try {
     if (isset($ultimoComprobante->FECompUltimoAutorizadoResult)) {
         $resultado = $ultimoComprobante->FECompUltimoAutorizadoResult;
         echo "✅ Información completa:\n";
-        echo "   • Número: {$resultado->CbteNro}\n";
-        echo "   • Punto de venta: {$resultado->PtoVta}\n";
-        echo "   • Tipo: {$resultado->CbteTipo}\n";
+        echo sprintf('   • Número: %s%s', $resultado->CbteNro, PHP_EOL);
+        echo sprintf('   • Punto de venta: %s%s', $resultado->PtoVta, PHP_EOL);
+        echo sprintf('   • Tipo: %s%s', $resultado->CbteTipo, PHP_EOL);
     }
+
     echo "\n";
 
     // Consultar información de un comprobante específico
@@ -255,13 +275,14 @@ try {
             $cae = $infoComprobante->CAE ?? 'N/A';
             $vencimiento = $infoComprobante->CAEFchVto ?? 'N/A';
             $total = $infoComprobante->ImpTotal ?? 'N/A';
-            echo "   • CAE: {$cae}\n";
-            echo "   • Vencimiento: {$vencimiento}\n";
-            echo "   • Total: \${$total}\n";
+            echo sprintf('   • CAE: %s%s', $cae, PHP_EOL);
+            echo sprintf('   • Vencimiento: %s%s', $vencimiento, PHP_EOL);
+            echo sprintf('   • Total: $%s%s', $total, PHP_EOL);
         } else {
             echo "❌ Comprobante no encontrado\n";
         }
     }
+
     echo "\n";
 
     // ========================================
@@ -300,7 +321,7 @@ try {
     echo "✅ Datos preparados:\n";
     echo "   • Tipo: Factura C\n";
     echo "   • Concepto: Productos\n";
-    echo "   • Total: \${$datosComprobante['ImpTotal']}\n";
+    echo sprintf('   • Total: $%s%s', $datosComprobante['ImpTotal'], PHP_EOL);
     echo "   • IVA: \${$datosComprobante['ImpIVA']}\n\n";
 
     echo "🚀 MÉTODO NUEVO: autorizarProximoComprobante()\n";
@@ -320,9 +341,9 @@ try {
     $periodoActual = (int) date('Ym');
     $orden = 1;
 
-    echo "📅 CAEA para período {$periodoActual}, orden {$orden}\n";
+    echo sprintf('📅 CAEA para período %d, orden %d%s', $periodoActual, $orden, PHP_EOL);
     echo "🔄 SIMULACIÓN: Solicitud de CAEA...\n";
-    echo "   • Período: {$periodoActual} (".date('Y-m').")\n";
+    echo sprintf('   • Período: %d (', $periodoActual).date('Y-m').")\n";
     echo "   • Orden: {$orden} (Primera quincena)\n\n";
 
     echo "⚠️  Para ejecutar realmente, descomenta:\n";
@@ -366,11 +387,13 @@ try {
     ];
 
     foreach ($metodos as $categoria => $metodosCategoria) {
-        echo "{$categoria}:\n";
+        echo $categoria.':
+';
         foreach ($metodosCategoria as $metodo => $descripcion) {
             $icono = str_contains($descripcion, '🆕') ? '🆕' : '  ';
-            echo "{$icono} {$metodo} - {$descripcion}\n";
+            echo sprintf('%s %s - %s%s', $icono, $metodo, $descripcion, PHP_EOL);
         }
+
         echo "\n";
     }
 

@@ -37,8 +37,8 @@ try {
     $tipoComprobante = 11;  // Tipo de comprobante (11 = Factura C)
 
     echo "Consultando comprobante:\n";
-    echo "• Número: {$numeroComprobante}\n";
-    echo "• Punto de venta: {$puntoVenta}\n";
+    echo sprintf('• Número: %d%s', $numeroComprobante, PHP_EOL);
+    echo sprintf('• Punto de venta: %d%s', $puntoVenta, PHP_EOL);
     echo "• Tipo: {$tipoComprobante} (Factura C)\n\n";
 
     // Consultar información del comprobante
@@ -57,47 +57,47 @@ try {
         // Mostrar información básica
         echo "INFORMACIÓN BÁSICA:\n";
         $numero = $informacionComprobante->CbteNro ?? $informacionComprobante->CbteDesde ?? 'N/A';
-        echo "• Número: {$numero}\n";
-        echo "• Punto de venta: {$informacionComprobante->PtoVta}\n";
-        echo "• Tipo: {$informacionComprobante->CbteTipo}\n";
-        echo "• Fecha: {$informacionComprobante->CbteFch}\n";
+        echo sprintf('• Número: %s%s', $numero, PHP_EOL);
+        echo sprintf('• Punto de venta: %s%s', $informacionComprobante->PtoVta, PHP_EOL);
+        echo sprintf('• Tipo: %s%s', $informacionComprobante->CbteTipo, PHP_EOL);
+        echo sprintf('• Fecha: %s%s', $informacionComprobante->CbteFch, PHP_EOL);
 
         // Mostrar información de autorización
         $cae = $informacionComprobante->CAE ?? $informacionComprobante->CodAutorizacion ?? null;
         if ($cae !== null) {
             echo "\nAUTORIZACIÓN:\n";
-            echo "• CAE: {$cae}\n";
+            echo sprintf('• CAE: %s%s', $cae, PHP_EOL);
             $vencimiento = $informacionComprobante->CAEFchVto ?? $informacionComprobante->FchVto ?? 'N/A';
-            echo "• Vencimiento CAE: {$vencimiento}\n";
-            echo "• Resultado: {$informacionComprobante->Resultado}\n";
+            echo sprintf('• Vencimiento CAE: %s%s', $vencimiento, PHP_EOL);
+            echo sprintf('• Resultado: %s%s', $informacionComprobante->Resultado, PHP_EOL);
         }
 
         // Mostrar información del receptor
         if (isset($informacionComprobante->DocTipo)) {
             echo "\nRECEPTOR:\n";
-            echo "• Tipo documento: {$informacionComprobante->DocTipo}\n";
-            echo "• Número documento: {$informacionComprobante->DocNro}\n";
+            echo sprintf('• Tipo documento: %s%s', $informacionComprobante->DocTipo, PHP_EOL);
+            echo sprintf('• Número documento: %s%s', $informacionComprobante->DocNro, PHP_EOL);
         }
 
         // Mostrar importes
         if (isset($informacionComprobante->ImpTotal)) {
             echo "\nIMPORTES:\n";
-            echo "• Total: \${$informacionComprobante->ImpTotal}\n";
+            echo sprintf('• Total: $%s%s', $informacionComprobante->ImpTotal, PHP_EOL);
 
             if (isset($informacionComprobante->ImpNeto)) {
-                echo "• Neto: \${$informacionComprobante->ImpNeto}\n";
+                echo sprintf('• Neto: $%s%s', $informacionComprobante->ImpNeto, PHP_EOL);
             }
 
             if (isset($informacionComprobante->ImpIVA)) {
-                echo "• IVA: \${$informacionComprobante->ImpIVA}\n";
+                echo sprintf('• IVA: $%s%s', $informacionComprobante->ImpIVA, PHP_EOL);
             }
         }
 
         // Mostrar moneda
         if (isset($informacionComprobante->MonId)) {
             echo "\nMONEDA:\n";
-            echo "• Tipo: {$informacionComprobante->MonId}\n";
-            echo "• Cotización: {$informacionComprobante->MonCotiz}\n";
+            echo sprintf('• Tipo: %s%s', $informacionComprobante->MonId, PHP_EOL);
+            echo sprintf('• Cotización: %s%s', $informacionComprobante->MonCotiz, PHP_EOL);
         }
 
         echo "\n--- RESPUESTA COMPLETA ---\n";
@@ -116,7 +116,7 @@ try {
     echo "Buscando múltiples comprobantes:\n\n";
 
     foreach ($comprobantesABuscar as $comprobante) {
-        echo "Consultando {$comprobante['descripcion']} N° {$comprobante['numero']}... ";
+        echo sprintf('Consultando %s N° %s... ', $comprobante['descripcion'], $comprobante['numero']);
 
         $info = $facturacionElectronica->obtenerInformacionComprobante(
             $comprobante['numero'],
@@ -128,7 +128,7 @@ try {
             echo "❌ No encontrado\n";
         } else {
             $cae = $info->CAE ?? $info->CodAutorizacion ?? 'N/A';
-            echo "✅ Encontrado - CAE: {$cae}\n";
+            echo sprintf('✅ Encontrado - CAE: %s%s', $cae, PHP_EOL);
         }
     }
 

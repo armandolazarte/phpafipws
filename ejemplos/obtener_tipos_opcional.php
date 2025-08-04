@@ -105,9 +105,9 @@ try {
         echo sprintf("Total de tipos opcionales: %d\n\n", count($tiposOpcional));
 
         // Mostrar los más comunes
-        $opcionalesComunes = array_filter($tiposOpcional, fn ($o) => isset($o->Id) && in_array($o->Id, [1, 2, 3, 4, 5]));
+        $opcionalesComunes = array_filter($tiposOpcional, fn ($o): bool => isset($o->Id) && in_array($o->Id, [1, 2, 3, 4, 5]));
 
-        if (! empty($opcionalesComunes)) {
+        if ($opcionalesComunes !== []) {
             echo "TIPOS MÁS UTILIZADOS:\n";
             echo str_repeat('-', 40)."\n";
             foreach ($opcionalesComunes as $opcional) {
@@ -115,6 +115,7 @@ try {
                 $desc = $opcional->Desc ?? 'Sin descripción';
                 echo sprintf("• ID %s: %s\n", $id, $desc);
             }
+
             echo "\n";
         }
 
@@ -123,7 +124,7 @@ try {
         if (isset($respuesta->FEParamGetTiposOpcionalResult->Errors->Err->Code)) {
             $error = $respuesta->FEParamGetTiposOpcionalResult->Errors->Err;
             echo "ℹ️  INFORMACIÓN SOBRE ERROR:\n";
-            echo "• Código: {$error->Code}\n";
+            echo sprintf('• Código: %s%s', $error->Code, PHP_EOL);
             echo "• Mensaje: {$error->Msg}\n\n";
 
             if ($error->Code === 602) {

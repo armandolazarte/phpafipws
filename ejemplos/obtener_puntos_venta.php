@@ -66,15 +66,15 @@ try {
         echo sprintf("Total de puntos de venta: %d\n\n", count($puntosVenta));
 
         // Mostrar estadísticas
-        $activos = array_filter($puntosVenta, fn ($pv) => ! isset($pv->FchBaja));
-        $inactivos = array_filter($puntosVenta, fn ($pv) => isset($pv->FchBaja));
+        $activos = array_filter($puntosVenta, fn ($pv): bool => ! isset($pv->FchBaja));
+        $inactivos = array_filter($puntosVenta, fn ($pv): bool => isset($pv->FchBaja));
 
         echo "ESTADÍSTICAS:\n";
         echo sprintf("• Puntos activos: %d\n", count($activos));
         echo sprintf("• Puntos inactivos: %d\n", count($inactivos));
 
         // Mostrar puntos activos para usar en facturación
-        if (! empty($activos)) {
+        if ($activos !== []) {
             echo "\nPUNTOS ACTIVOS PARA FACTURACIÓN:\n";
             foreach ($activos as $puntoActivo) {
                 echo sprintf("• PtoVta: %d - %s\n",
@@ -90,7 +90,7 @@ try {
             $respuesta->FEParamGetPtosVentaResult->Errors->Err->Code === 602) {
 
             echo "ℹ️  INFORMACIÓN SOBRE ERROR 602:\n";
-            echo "• Código: {$respuesta->FEParamGetPtosVentaResult->Errors->Err->Code}\n";
+            echo sprintf('• Código: %d%s', $respuesta->FEParamGetPtosVentaResult->Errors->Err->Code, PHP_EOL);
             echo "• Mensaje: {$respuesta->FEParamGetPtosVentaResult->Errors->Err->Msg}\n\n";
 
             echo "📋 EXPLICACIÓN:\n";

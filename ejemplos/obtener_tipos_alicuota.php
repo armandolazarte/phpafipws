@@ -51,7 +51,7 @@ try {
         echo str_repeat('=', 70)."\n";
 
         // Ordenar por ID para mejor visualización
-        usort($tiposAlicuota, fn ($a, $b) => $a->Id <=> $b->Id);
+        usort($tiposAlicuota, fn ($a, $b): int => $a->Id <=> $b->Id);
 
         foreach ($tiposAlicuota as $alicuota) {
             $id = $alicuota->Id ?? 'N/A';
@@ -107,9 +107,9 @@ try {
         echo sprintf("Total de tipos de alícuota: %d\n\n", count($tiposAlicuota));
 
         // Mostrar las más comunes
-        $alicuotasComunes = array_filter($tiposAlicuota, fn ($a) => isset($a->Id) && in_array($a->Id, [3, 4, 5, 6]));
+        $alicuotasComunes = array_filter($tiposAlicuota, fn ($a): bool => isset($a->Id) && in_array($a->Id, [3, 4, 5, 6]));
 
-        if (! empty($alicuotasComunes)) {
+        if ($alicuotasComunes !== []) {
             echo "ALÍCUOTAS MÁS UTILIZADAS:\n";
             echo str_repeat('-', 40)."\n";
             foreach ($alicuotasComunes as $alicuota) {
@@ -117,6 +117,7 @@ try {
                 $desc = $alicuota->Desc ?? 'Sin descripción';
                 echo sprintf("• ID %s: %s\n", $id, $desc);
             }
+
             echo "\n";
         }
 

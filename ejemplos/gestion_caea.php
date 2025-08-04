@@ -46,7 +46,7 @@ try {
     $orden = 1; // 1 = Primera quincena, 2 = Segunda quincena
 
     echo "Solicitando CAEA para:\n";
-    echo "• Período: {$periodoActual} (".date('Y-m').")\n";
+    echo sprintf('• Período: %d (', $periodoActual).date('Y-m').")\n";
     echo "• Orden: {$orden} (Primera quincena)\n\n";
 
     // SIMULACIÓN: En un entorno real, descomenta las siguientes líneas
@@ -113,14 +113,14 @@ try {
     // Para la demostración, simulamos la respuesta
     echo "🔄 SIMULACIÓN: Información del CAEA:\n\n";
     echo "INFORMACIÓN DETALLADA:\n";
-    echo "• CAEA: {$numeroCAEA}\n";
-    echo "• Período: {$periodoActual}\n";
-    echo "• Orden: {$orden}\n";
+    echo sprintf('• CAEA: %d%s', $numeroCAEA, PHP_EOL);
+    echo sprintf('• Período: %d%s', $periodoActual, PHP_EOL);
+    echo sprintf('• Orden: %d%s', $orden, PHP_EOL);
     $primerDia = strtotime('first day of this month');
     $dia15 = strtotime(date('Y-m-15'));
     $dia16 = strtotime(date('Y-m-16'));
 
-    echo '• Vigente desde: '.($primerDia ? date('Ymd', $primerDia) : date('Ym01'))."\n";
+    echo '• Vigente desde: '.($primerDia !== 0 ? date('Ymd', $primerDia) : date('Ym01'))."\n";
     echo '• Vigente hasta: '.($dia15 ? date('Ymd', $dia15) : date('Ym15'))."\n";
     echo '• Fecha tope informar: '.($dia16 ? date('Ymd', $dia16) : date('Ym16'))."\n";
     echo "• Estado: ✅ VIGENTE (simulado)\n\n";

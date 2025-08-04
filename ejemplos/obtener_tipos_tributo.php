@@ -51,7 +51,7 @@ try {
         echo str_repeat('=', 70)."\n";
 
         // Ordenar por ID para mejor visualización
-        usort($tiposTributo, fn ($a, $b) => ($a->Id ?? 0) <=> ($b->Id ?? 0));
+        usort($tiposTributo, fn ($a, $b): int => ($a->Id ?? 0) <=> ($b->Id ?? 0));
 
         foreach ($tiposTributo as $tributo) {
             $id = $tributo->Id ?? 'N/A';
@@ -113,9 +113,9 @@ try {
         echo sprintf("Total de tipos de tributos: %d\n\n", count($tiposTributo));
 
         // Mostrar los más comunes
-        $tributosComunes = array_filter($tiposTributo, fn ($t) => isset($t->Id) && in_array($t->Id, [1, 2, 3, 4, 5]));
+        $tributosComunes = array_filter($tiposTributo, fn ($t): bool => isset($t->Id) && in_array($t->Id, [1, 2, 3, 4, 5]));
 
-        if (! empty($tributosComunes)) {
+        if ($tributosComunes !== []) {
             echo "TRIBUTOS MÁS UTILIZADOS:\n";
             echo str_repeat('-', 40)."\n";
             foreach ($tributosComunes as $tributo) {
@@ -123,6 +123,7 @@ try {
                 $desc = $tributo->Desc ?? 'Sin descripción';
                 echo sprintf("• ID %s: %s\n", $id, $desc);
             }
+
             echo "\n";
         }
 
@@ -131,7 +132,7 @@ try {
         if (isset($respuesta->FEParamGetTiposTributosResult->Errors->Err->Code)) {
             $error = $respuesta->FEParamGetTiposTributosResult->Errors->Err;
             echo "ℹ️  INFORMACIÓN SOBRE ERROR:\n";
-            echo "• Código: {$error->Code}\n";
+            echo sprintf('• Código: %s%s', $error->Code, PHP_EOL);
             echo "• Mensaje: {$error->Msg}\n\n";
 
             if ($error->Code === 602) {
