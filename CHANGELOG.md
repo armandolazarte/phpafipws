@@ -5,6 +5,177 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere al [Versionado Semántico](https://semver.org/lang/es/).
 
+## [1.2.0] - 2025-05-08
+
+### ✨ Agregado
+
+#### Nueva Clase GeneradorCertificados
+
+Se agregó una nueva clase `GeneradorCertificados` que proporciona utilidades completas para la gestión de certificados digitales y claves privadas, facilitando el proceso de autenticación con AFIP.
+
+**Métodos principales:**
+
+-   **`generarClavePrivada(int $bits = 2048, ?string $fraseSecreta = null): string`**
+
+    -   Genera claves privadas RSA con el tamaño mínimo requerido por AFIP (2048 bits)
+    -   Soporte opcional para frases secretas de protección
+    -   Validación automática de requisitos de seguridad
+
+-   **`generarCSR(string|array $clavePrivada, array $informacionDn): string`**
+
+    -   Crea Certificate Signing Requests válidos para AFIP
+    -   Acepta claves privadas como texto o rutas de archivo
+    -   Soporte para claves protegidas con frase secreta
+
+-   **`extraerInformacionCSR(string $solicitudCSR): array`**
+
+    -   Extrae el Distinguished Name de CSRs existentes
+    -   Útil para verificar información antes de enviar a AFIP
+    -   Manejo robusto de diferentes formatos de CSR
+
+-   **`extraerInformacionCertificado(string $certificadoPem): array`**
+
+    -   Analiza certificados X.509 y extrae información completa
+    -   Incluye fechas de validez, emisor, sujeto y número de serie
+    -   Compatible con certificados descargados de AFIP
+
+-   **`crearInformacionDN(string $cuit, string $nombreOrganizacion, string $nombreComun, ...): array`**
+
+    -   Crea Distinguished Names válidos para AFIP
+    -   Validación automática de formato de CUIT
+    -   Valores por defecto para Argentina
+
+-   **`validarInformacionDN(array $informacionDn): bool`**
+    -   Valida que el DN contenga todos los campos requeridos por AFIP
+    -   Verificación de formato de CUIT en serialNumber
+    -   Mensajes de error específicos para cada campo
+
+#### Nueva Excepción CertificadoException
+
+-   **`CertificadoException`** - Excepción específica para errores de certificados
+    -   Información contextual sobre la operación que falló
+    -   Detalles del certificado o CSR problemático
+    -   Códigos de error específicos para diferentes tipos de problemas
+
+#### Nuevos Códigos de Error
+
+Se agregaron códigos de error específicos en el enum `CodigosError`:
+
+-   `CERTIFICADO_ERROR_GENERAR_CSR` - Error al generar CSR
+-   `CERTIFICADO_ERROR_EXPORTAR_CSR` - Error al exportar CSR
+-   `CERTIFICADO_ERROR_LEER_CSR` - Error al leer CSR
+-   `CERTIFICADO_ERROR_LEER_CERTIFICADO` - Error al leer certificado
+-   `VALIDACION_DN_INCOMPLETO` - DN incompleto o inválido
+-   `VALIDACION_CUIT_INVALIDO` - CUIT con formato incorrecto
+-   `VALIDACION_FORMATO_CUIT` - Formato de CUIT en serialNumber incorrecto
+
+#### Nuevos Ejemplos Completos
+
+Se agregaron **6 ejemplos** en la carpeta `ejemplos/generador_certificados/`:
+
+-   **`1_generar_clave_privada.php`** - Generación de claves privadas RSA
+
+    -   Diferentes tamaños de clave (2048, 4096 bits)
+    -   Con y sin frases secretas
+    -   Guardado seguro en archivos
+
+-   **`2_crear_informacion_distinguida.php`** - Creación de Distinguished Names
+
+    -   Información DN válida para AFIP
+    -   Validación de campos requeridos
+    -   Ejemplos para diferentes tipos de contribuyentes
+
+-   **`3_generar_csr_nueva.php`** - Generación de Certificate Signing Requests
+
+    -   Proceso completo desde clave privada hasta CSR
+    -   Manejo de claves protegidas con frase secreta
+    -   Guardado de CSR para envío a AFIP
+
+-   **`4_extraer_dn_csr.php`** - Extracción de información de CSRs
+
+    -   Lectura de CSRs existentes
+    -   Verificación de información antes de envío
+    -   Comparación con datos originales
+
+-   **`5_validar_informacion_dn.php`** - Validación de Distinguished Names
+
+    -   Verificación de campos requeridos
+    -   Validación de formato de CUIT
+    -   Manejo de errores de validación
+
+-   **`6_extraer_informacion_certificado.php`** - Análisis de certificados X.509
+    -   Extracción de información completa
+    -   Verificación de fechas de validez
+    -   Análisis de emisor y sujeto
+
+#### Integración con phpseclib3
+
+-   **Dependencia opcional**: `phpseclib/phpseclib:~3.0`
+-   **Operaciones nativas**: Sin dependencias de OpenSSL del sistema
+-   **Compatibilidad**: Funciona en cualquier entorno PHP con las extensiones básicas
+-   **Seguridad**: Implementación robusta de operaciones criptográficas
+
+#### Documentación Especializada
+
+-   **`docs/GeneradorCertificados.md`** - Guía completa de la nueva clase
+    -   Ejemplos de uso para cada método
+    -   Flujo completo para obtener certificados de AFIP
+    -   Consideraciones de seguridad
+    -   Códigos de error y troubleshooting
+
+### 🔧 Mejorado
+
+#### Manejo de Errores
+
+-   **Excepciones específicas**: Mejor categorización de errores de certificados
+-   **Información contextual**: Detalles sobre la operación que falló
+-   **Códigos estructurados**: Identificación programática de tipos de error
+-   **Mensajes descriptivos**: Explicaciones claras para debugging
+
+#### Validaciones
+
+-   **Requisitos AFIP**: Validación automática de requisitos mínimos
+-   **Formato CUIT**: Verificación de formato en Distinguished Names
+-   **Tamaño de claves**: Validación de bits mínimos (2048)
+-   **Campos requeridos**: Verificación de DN completos
+
+#### Documentación
+
+-   **README actualizado**: Información sobre GeneradorCertificados
+-   **Ejemplos prácticos**: 6 nuevos ejemplos paso a paso
+-   **Guía especializada**: Documentación completa en docs/
+-   **Casos de uso**: Ejemplos para diferentes escenarios
+
+### 📊 Estadísticas Actuales
+
+-   **30 ejemplos totales** (24 anteriores + 6 nuevos)
+-   **100% cobertura** de funcionalidad de certificados
+-   **Nueva clase utilitaria** para gestión de certificados
+-   **Integración completa** con el ecosistema existente
+
+### 🛠️ Casos de Uso Cubiertos
+
+#### Generación Completa de Certificados
+
+-   Crear claves privadas con diferentes niveles de seguridad
+-   Generar CSRs válidos para AFIP
+-   Validar información antes del envío
+-   Analizar certificados recibidos de AFIP
+
+#### Gestión de Certificados Existentes
+
+-   Extraer información de certificados en uso
+-   Verificar fechas de vencimiento
+-   Validar estructura de CSRs
+-   Migrar entre diferentes formatos
+
+#### Automatización de Procesos
+
+-   Scripts para renovación de certificados
+-   Validación automática de requisitos
+-   Generación masiva para múltiples entidades
+-   Integración con sistemas de gestión
+
 ## [1.1.2] - 2025-04-08
 
 ### ✨ Agregado
