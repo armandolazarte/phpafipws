@@ -35,9 +35,9 @@ class FacturacionElectronicaException extends WebServiceException
         string $mensaje = '',
         string $operacion = '',
         ?array $parametros = null,
-        private ?string $tipoComprobante = null,
-        private ?int $puntoVenta = null,
-        private ?string $cae = null,
+        private readonly ?string $tipoComprobante = null,
+        private readonly ?int $puntoVenta = null,
+        private readonly ?string $cae = null,
         int $codigo = CodigosError::SERVICIO_WEB_FACTURACION_ERROR->value,
         ?Exception $excepcion = null,
         array $contexto = []

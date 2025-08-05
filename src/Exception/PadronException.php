@@ -35,9 +35,9 @@ class PadronException extends WebServiceException
         string $mensaje = '',
         string $operacion = '',
         ?array $parametros = null,
-        private ?string $cuit = null,
-        private ?int $alcance = null,
-        private ?string $tipoConsulta = null,
+        private readonly ?string $cuit = null,
+        private readonly ?int $alcance = null,
+        private readonly ?string $tipoConsulta = null,
         int $codigo = CodigosError::SERVICIO_WEB_PADRON_ERROR->value,
         ?Exception $excepcion = null,
         array $contexto = []

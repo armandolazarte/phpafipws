@@ -22,8 +22,8 @@ class TokenAuthorization
      * @param  string  $firma  La firma digital (Sign) asociada al token, también proporcionada por AFIP.
      */
     public function __construct(
-        private string $token,
-        private string $firma
+        private readonly string $token,
+        private readonly string $firma
     ) {}
 
     /**

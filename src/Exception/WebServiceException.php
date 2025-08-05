@@ -30,9 +30,9 @@ class WebServiceException extends AfipException
      */
     public function __construct(
         string $mensaje = '',
-        private string $nombreServicio = '',
-        private string $operacion = '',
-        private ?array $parametros = null,
+        private readonly string $nombreServicio = '',
+        private readonly string $operacion = '',
+        private readonly ?array $parametros = null,
         int $codigo = CodigosError::SERVICIO_WEB_GENERAL->value,
         ?Exception $excepcion = null,
         array $contexto = []

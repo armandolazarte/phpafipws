@@ -30,9 +30,9 @@ class SoapException extends AfipException
      */
     public function __construct(
         string $mensaje = '',
-        private string $codigoFalloSoap = '',
-        private string $mensajeFalloSoap = '',
-        private string $operacion = '',
+        private readonly string $codigoFalloSoap = '',
+        private readonly string $mensajeFalloSoap = '',
+        private readonly string $operacion = '',
         int $codigo = CodigosError::SOAP_GENERAL->value,
         ?Exception $excepcion = null,
         array $contexto = []

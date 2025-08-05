@@ -29,8 +29,8 @@ class ConfiguracionException extends AfipException
      */
     public function __construct(
         string $mensaje = '',
-        private string $campoConfiguracion = '',
-        private mixed $valorProporcionado = null,
+        private readonly string $campoConfiguracion = '',
+        private readonly mixed $valorProporcionado = null,
         int $codigo = CodigosError::CONFIGURACION_GENERAL->value,
         ?Exception $excepcion = null,
         array $contexto = []

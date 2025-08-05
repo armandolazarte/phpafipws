@@ -29,8 +29,8 @@ class AutenticacionException extends AfipException
      */
     public function __construct(
         string $mensaje = '',
-        private string $servicio = '',
-        private ?string $infoToken = null,
+        private readonly string $servicio = '',
+        private readonly ?string $infoToken = null,
         int $codigo = CodigosError::AUTENTICACION_GENERAL->value,
         ?Exception $excepcion = null,
         array $contexto = []

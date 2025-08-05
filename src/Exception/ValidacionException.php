@@ -30,9 +30,9 @@ class ValidacionException extends AfipException
      */
     public function __construct(
         string $mensaje = '',
-        private string $campo = '',
-        private mixed $valor = null,
-        private string $regla = '',
+        private readonly string $campo = '',
+        private readonly mixed $valor = null,
+        private readonly string $regla = '',
         int $codigo = CodigosError::VALIDACION_GENERAL->value,
         ?Exception $excepcion = null,
         array $contexto = []

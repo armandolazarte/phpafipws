@@ -29,8 +29,8 @@ class ArchivoException extends AfipException
      */
     public function __construct(
         string $mensaje = '',
-        private string $rutaArchivo = '',
-        private string $operacion = '',
+        private readonly string $rutaArchivo = '',
+        private readonly string $operacion = '',
         int $codigo = CodigosError::ARCHIVO_GENERAL->value,
         ?Exception $excepcion = null,
         array $contexto = []
