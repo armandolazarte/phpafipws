@@ -39,6 +39,7 @@ phpunit.phar
 /ejemplos/resources/*.crt
 /ejemplos/resources/*.key
 /ejemplos/resources/*.p12
+/credenciales/
 
 # Ticket Access files
 /ta/
