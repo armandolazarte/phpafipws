@@ -20,6 +20,16 @@ Las contribuciones son bienvenidas y se aceptan a través de pull requests. Por 
 -   Puede que necesites hacer un "[rebase](https://git-scm.com/book/en/v2/Git-Branching-Rebasing)" para evitar conflictos de fusión.
 -   Por favor, recuerda que seguimos [SemVer](https://semver.org/lang/es/).
 
+### Guías Específicas
+
+-   **Tests**: Todo código nuevo debe incluir tests unitarios
+-   **Estilo**: Seguir PSR-12 y las reglas de PHP CS Fixer
+-   **Tipos**: Usar tipado estricto en todo el código
+-   **Documentación**: Actualizar README y docstrings según corresponda
+-   **Ejemplos**: Agregar ejemplos prácticos para nuevas funcionalidades
+-   **Excepciones**: Usar excepciones específicas con información contextual
+-   **Certificados**: Para funcionalidades de certificados, incluir validaciones de seguridad
+
 ---
 
 ## Configuración
