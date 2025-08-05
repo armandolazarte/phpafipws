@@ -27,7 +27,21 @@ PhpAfipWs es un SDK moderno y robusto para interactuar con los Web Services de A
 -   **Confiable**: 99 tests automatizados con Pest 4
 -   **Mantenido**: Actualizaciones regulares y soporte activo
 
-### 🆕 Novedades v1.1.2
+### 🆕 Novedades v1.2.0
+
+-   **Nueva clase GeneradorCertificados**: Utilidades completas para gestión de certificados y claves
+    -   `generarClavePrivada()` - Generar claves privadas RSA con phpseclib3
+    -   `generarCSR()` - Crear Certificate Signing Requests para AFIP
+    -   `extraerInformacionCSR()` - Extraer información de CSRs existentes
+    -   `extraerInformacionCertificado()` - Analizar certificados X.509
+    -   `crearInformacionDN()` - Crear Distinguished Names válidos para AFIP
+    -   `validarInformacionDN()` - Validar estructura de Distinguished Names
+-   **Nueva excepción CertificadoException**: Manejo específico de errores de certificados
+-   **6 ejemplos nuevos**: Guías paso a paso para generación de certificados
+-   **Integración con phpseclib3**: Soporte nativo para operaciones criptográficas
+-   **Documentación especializada**: Guía completa en `docs/GeneradorCertificados.md`
+
+### 🔄 Novedades anteriores v1.1.2
 
 -   **Nuevos métodos CAEA**: 3 métodos adicionales para gestión completa de CAEA
     -   `informarCAEASinMovimiento()` - Informar CAEA sin movimiento
@@ -57,13 +71,42 @@ composer require armandolazarte/phpafipws
 -   Certificado digital de AFIP
 -   Clave privada correspondiente
 
+### Dependencias Opcionales
+
+-   **phpseclib/phpseclib:~3.0** - Para generar certificados y claves con `GeneradorCertificados`
+
 ## 🔧 Configuración Inicial
 
 ### 1. Obtener Certificados
 
-Necesitas obtener un certificado digital de AFIP:
+Tienes dos opciones para obtener certificados:
 
-1. Genera una clave privada y CSR
+#### Opción A: Generar con GeneradorCertificados (Recomendado)
+
+```php
+use PhpAfipWs\Authorization\GeneradorCertificados;
+
+// 1. Generar clave privada
+$clavePrivada = GeneradorCertificados::generarClavePrivada(2048, 'mi_frase_secreta');
+file_put_contents('clave_privada.key', $clavePrivada);
+
+// 2. Crear información DN
+$dn = GeneradorCertificados::crearInformacionDN(
+    cuit: '20123456789',
+    nombreOrganizacion: 'Mi Empresa S.A.',
+    nombreComun: 'mi_empresa'
+);
+
+// 3. Generar CSR
+$csr = GeneradorCertificados::generarCSR('clave_privada.key', $dn);
+file_put_contents('certificado.csr', $csr);
+
+// 4. Subir CSR a AFIP y descargar certificado
+```
+
+#### Opción B: Proceso Manual
+
+1. Genera una clave privada y CSR con herramientas externas
 2. Solicita el certificado en el sitio de AFIP
 3. Descarga el certificado (.crt) y guarda tu clave privada (.key)
 
@@ -175,7 +218,9 @@ if ($respuesta->FECAESolicitarResult->FeDetResp->FECAEDetResponse->Resultado ===
 }
 ```
 
-## 🛠️ Web Services Disponibles
+## 🛠️ Web Services y Utilidades Disponibles
+
+### Web Services AFIP
 
 -   **FacturacionElectronica**: Facturación electrónica (WSFE)
 -   **PadronAlcanceCuatro**: Padrón A4
@@ -184,9 +229,18 @@ if ($respuesta->FECAESolicitarResult->FeDetResp->FECAEDetResponse->Resultado ===
 -   **PadronAlcanceDiez**: Padrón A10
 -   **PadronAlcanceTrece**: Padrón A13
 
+### Utilidades de Certificados
+
+-   **GeneradorCertificados**: Generación y gestión de certificados digitales
+    -   Generación de claves privadas RSA
+    -   Creación de Certificate Signing Requests (CSR)
+    -   Extracción de información de certificados y CSRs
+    -   Validación de Distinguished Names
+    -   Utilidades de archivos para certificados
+
 ## 📚 Ejemplos
 
-El directorio `ejemplos/` contiene **24 ejemplos completos** que cubren **100% de los métodos** disponibles:
+El directorio `ejemplos/` contiene **30 ejemplos completos** que cubren **100% de los métodos** disponibles:
 
 ### Facturación Electrónica
 
@@ -213,6 +267,14 @@ El directorio `ejemplos/` contiene **24 ejemplos completos** que cubren **100% d
 -   **Estado del servidor y diagnósticos**: Verificación de disponibilidad de servicios
 -   **Demostración completa**: Ejemplos de todos los métodos disponibles
 
+### Generación de Certificados
+
+-   **Generación de claves privadas**: Crear claves RSA con diferentes tamaños y frases secretas
+-   **Creación de CSRs**: Generar Certificate Signing Requests válidos para AFIP
+-   **Gestión de Distinguished Names**: Crear y validar información DN
+-   **Análisis de certificados**: Extraer información de certificados X.509 existentes
+-   **Flujo completo**: Proceso paso a paso desde clave privada hasta certificado final
+
 Todos los ejemplos incluyen:
 
 -   ✅ Código funcional sin warnings
@@ -229,6 +291,29 @@ Todos los ejemplos incluyen:
 echo $afip->obtenerVersionSDK(); // Versión actual
 echo $afip->obtenerCuit(); // CUIT configurado
 echo $afip->esModoProduccion() ? 'Producción' : 'Homologación';
+```
+
+### Generación de Certificados
+
+```php
+use PhpAfipWs\Authorization\GeneradorCertificados;
+
+// Generar clave privada RSA
+$clavePrivada = GeneradorCertificados::generarClavePrivada(2048, 'frase_secreta');
+
+// Crear información DN para AFIP
+$dn = GeneradorCertificados::crearInformacionDN(
+    cuit: '20123456789',
+    nombreOrganizacion: 'Mi Empresa S.A.',
+    nombreComun: 'mi_empresa'
+);
+
+// Generar CSR
+$csr = GeneradorCertificados::generarCSR($clavePrivada, $dn);
+
+// Extraer información de certificado
+$info = GeneradorCertificados::extraerInformacionCertificado($certificadoPem);
+echo "Válido hasta: " . date('Y-m-d', $info['validTo_time_t']);
 ```
 
 ### Facturación Electrónica - Métodos Principales
@@ -302,6 +387,7 @@ El SDK utiliza excepciones específicas para diferentes tipos de errores con inf
 ```php
 use PhpAfipWs\Exception\AfipException;
 use PhpAfipWs\Exception\AutenticacionException;
+use PhpAfipWs\Exception\CertificadoException;
 use PhpAfipWs\Exception\ConfiguracionException;
 use PhpAfipWs\Exception\ValidacionException;
 use PhpAfipWs\Exception\ArchivoException;
@@ -318,6 +404,9 @@ try {
     echo "Error de validación: " . $e->getMessage();
     echo "Campo: " . $e->obtenerCampo();
     echo "Valor: " . $e->obtenerValor();
+} catch (CertificadoException $e) {
+    echo "Error de certificado: " . $e->getMessage();
+    echo "Operación: " . $e->obtenerOperacion();
 } catch (ArchivoException $e) {
     echo "Error de archivo: " . $e->getMessage();
 } catch (AfipException $e) {
