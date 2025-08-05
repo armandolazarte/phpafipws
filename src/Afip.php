@@ -35,7 +35,7 @@ class Afip
     /**
      * Versión actual del SDK.
      */
-    private const VERSION_SDK = '1.1.1';
+    private const VERSION_SDK = '1.2.0';
 
     /**
      * URL del servicio WSAA para el entorno de producción.
