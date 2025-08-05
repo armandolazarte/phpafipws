@@ -1,14 +1,15 @@
 # Ejemplos de PhpAfipWs
 
-Esta carpeta contiene **24 ejemplos prácticos** que cubren **100% de los métodos** disponibles del SDK PhpAfipWs para diferentes tipos de comprobantes y operaciones.
+Esta carpeta contiene **30 ejemplos prácticos** que cubren **100% de los métodos** disponibles del SDK PhpAfipWs para diferentes tipos de comprobantes, operaciones y gestión de certificados.
 
 ## ✨ Características de los Ejemplos
 
--   ✅ **Cobertura completa**: 22/22 métodos públicos de FacturacionElectronica
+-   ✅ **Cobertura completa**: 22/22 métodos públicos de FacturacionElectronica + GeneradorCertificados
 -   ✅ **Sin warnings**: Todos los ejemplos ejecutan sin errores
 -   ✅ **Código educativo**: Explicaciones detalladas y mejores prácticas
 -   ✅ **Funciones helper**: Código reutilizable incluido
 -   ✅ **Casos reales**: Basados en situaciones de uso común
+-   ✅ **Gestión de certificados**: Ejemplos completos para generación y análisis
 
 ## 🆕 Nuevos métodos v1.1.0
 
@@ -49,6 +50,15 @@ Los ejemplos han sido actualizados para mostrar los nuevos métodos simplificado
 
 -   **`nuevos_metodos_v1_1.php`** - Demostración completa de los nuevos métodos
 -   **`demo_completa_metodos.php`** - ✅ Demostración de TODOS los métodos disponibles
+
+### Gestión de Certificados (GeneradorCertificados)
+
+-   **`generador_certificados/1_generar_clave_privada.php`** - Generar claves privadas RSA con diferentes tamaños
+-   **`generador_certificados/2_crear_informacion_distinguida.php`** - Crear Distinguished Names válidos para AFIP
+-   **`generador_certificados/3_generar_csr_nueva.php`** - Generar Certificate Signing Requests para AFIP
+-   **`generador_certificados/4_extraer_dn_csr.php`** - Extraer información de CSRs existentes
+-   **`generador_certificados/5_validar_informacion_dn.php`** - Validar estructura de Distinguished Names
+-   **`generador_certificados/6_extraer_informacion_certificado.php`** - Analizar certificados X.509 de AFIP
 
 ### CAEA (Código de Autorización Electrónico Anticipado)
 
@@ -169,6 +179,14 @@ php ejemplos/gestion_caea.php
 php ejemplos/informar_caea_sin_movimiento.php
 php ejemplos/consultar_caea_sin_movimiento.php
 php ejemplos/registrar_comprobantes_con_caea.php
+
+# Gestión de certificados
+php ejemplos/generador_certificados/1_generar_clave_privada.php
+php ejemplos/generador_certificados/2_crear_informacion_distinguida.php
+php ejemplos/generador_certificados/3_generar_csr_nueva.php
+php ejemplos/generador_certificados/4_extraer_dn_csr.php
+php ejemplos/generador_certificados/5_validar_informacion_dn.php
+php ejemplos/generador_certificados/6_extraer_informacion_certificado.php
 ```
 
 ## ⚠️ Notas importantes
@@ -219,8 +237,9 @@ php ejemplos/registrar_comprobantes_con_caea.php
 -   **Consultas de Parámetros**: 10 ejemplos (tipos, alícuotas, cotizaciones, actividades, etc.)
 -   **Gestión Avanzada**: 6 ejemplos (CAEA completo, consultas, estado)
 -   **Demostración**: 2 ejemplos (métodos nuevos, demo completa)
+-   **Gestión de Certificados**: 6 ejemplos (GeneradorCertificados completo)
 
-**Total: 24 ejemplos cubriendo 100% de la funcionalidad**
+**Total: 30 ejemplos cubriendo 100% de la funcionalidad**
 
 ## 🤝 Contribuir
 
