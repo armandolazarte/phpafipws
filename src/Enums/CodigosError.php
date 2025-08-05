@@ -33,6 +33,12 @@ enum CodigosError: int
     /** Configuración de entorno inválida. */
     case CONFIGURACION_ENTORNO_INVALIDO = 1005;
 
+    /** Dependencia de configuración faltante. */
+    case CONFIGURACION_DEPENDENCIA_FALTANTE = 1006;
+
+    /** Error interno de configuración. */
+    case CONFIGURACION_ERROR_INTERNO = 1007;
+
     // ========================================
     // ERRORES DE VALIDACIÓN (2xxx)
     // ========================================
@@ -59,6 +65,15 @@ enum CodigosError: int
 
     /** Longitud de campo inválida. */
     case VALIDACION_LONGITUD_INVALIDA = 2007;
+
+    /** DN (Distinguished Name) incompleto. */
+    case VALIDACION_DN_INCOMPLETO = 2008;
+
+    /** Formato de CUIT inválido. */
+    case VALIDACION_FORMATO_CUIT = 2009;
+
+    /** Parámetro inválido. */
+    case VALIDACION_PARAMETRO_INVALIDO = 2010;
 
     // ========================================
     // ERRORES DE ARCHIVOS (3xxx)
@@ -171,6 +186,45 @@ enum CodigosError: int
     /** Error específico de constancia de inscripción. */
     case SERVICIO_WEB_CONSTANCIA_ERROR = 6300;
 
+    // ========================================
+    // ERRORES DE CERTIFICADOS Y CSR (7xxx)
+    // ========================================
+    /** Error al generar CSR. */
+    case CERTIFICADO_ERROR_GENERAR_CSR = 7001;
+
+    /** Error al exportar CSR. */
+    case CERTIFICADO_ERROR_EXPORTAR_CSR = 7002;
+
+    /** Error al leer CSR. */
+    case CERTIFICADO_ERROR_LEER_CSR = 7003;
+
+    /** Error al leer certificado. */
+    case CERTIFICADO_ERROR_LEER_CERTIFICADO = 7004;
+
+    /** Error al generar clave. */
+    case CERTIFICADO_ERROR_GENERAR_CLAVE = 7005;
+
+    /** Error al exportar clave. */
+    case CERTIFICADO_ERROR_EXPORTAR_CLAVE = 7006;
+
+    /** Clave inválida. */
+    case CERTIFICADO_CLAVE_INVALIDA = 7007;
+
+    /** Tipo de clave inválido. */
+    case CERTIFICADO_TIPO_CLAVE_INVALIDO = 7008;
+
+    /** Tamaño de clave insuficiente. */
+    case CERTIFICADO_TAMAÑO_CLAVE_INSUFICIENTE = 7009;
+
+    /** Clave pública inválida. */
+    case CERTIFICADO_CLAVE_PUBLICA_INVALIDA = 7010;
+
+    /** Error al firmar certificado. */
+    case CERTIFICADO_ERROR_FIRMAR = 7011;
+
+    /** Error al verificar certificado. */
+    case CERTIFICADO_ERROR_VERIFICAR = 7012;
+
     // ----------------------------------------
     // MÉTODOS DEL ENUM
     // ----------------------------------------
@@ -187,6 +241,8 @@ enum CodigosError: int
             self::CONFIGURACION_ARCHIVO_NO_ENCONTRADO => 'Archivo de configuración no encontrado',
             self::CONFIGURACION_FORMATO_INVALIDO => 'Formato de configuración inválido',
             self::CONFIGURACION_ENTORNO_INVALIDO => 'Configuración de entorno inválida',
+            self::CONFIGURACION_DEPENDENCIA_FALTANTE => 'Dependencia de configuración faltante',
+            self::CONFIGURACION_ERROR_INTERNO => 'Error interno de configuración',
             self::VALIDACION_GENERAL => 'Error genérico de validación',
             self::VALIDACION_CUIT_INVALIDO => 'CUIT inválido',
             self::VALIDACION_FECHA_INVALIDA => 'Formato de fecha inválido',
@@ -195,6 +251,9 @@ enum CodigosError: int
             self::VALIDACION_FUERA_DE_RANGO => 'Valor fuera de rango permitido',
             self::VALIDACION_FORMATO_STRING => 'Formato de string inválido',
             self::VALIDACION_LONGITUD_INVALIDA => 'Longitud de campo inválida',
+            self::VALIDACION_DN_INCOMPLETO => 'DN (Distinguished Name) incompleto',
+            self::VALIDACION_FORMATO_CUIT => 'Formato de CUIT inválido',
+            self::VALIDACION_PARAMETRO_INVALIDO => 'Parámetro inválido',
             self::ARCHIVO_GENERAL => 'Error genérico de archivo',
             self::ARCHIVO_NO_ENCONTRADO => 'Archivo no encontrado',
             self::ARCHIVO_ERROR_LECTURA => 'Error de lectura de archivo',
@@ -228,6 +287,18 @@ enum CodigosError: int
             self::SERVICIO_WEB_FACTURACION_ERROR => 'Error específico de facturación electrónica',
             self::SERVICIO_WEB_PADRON_ERROR => 'Error específico de padrón',
             self::SERVICIO_WEB_CONSTANCIA_ERROR => 'Error específico de constancia de inscripción',
+            self::CERTIFICADO_ERROR_GENERAR_CSR => 'Error al generar CSR',
+            self::CERTIFICADO_ERROR_EXPORTAR_CSR => 'Error al exportar CSR',
+            self::CERTIFICADO_ERROR_LEER_CSR => 'Error al leer CSR',
+            self::CERTIFICADO_ERROR_LEER_CERTIFICADO => 'Error al leer certificado',
+            self::CERTIFICADO_ERROR_GENERAR_CLAVE => 'Error al generar clave',
+            self::CERTIFICADO_ERROR_EXPORTAR_CLAVE => 'Error al exportar clave',
+            self::CERTIFICADO_CLAVE_INVALIDA => 'Clave inválida',
+            self::CERTIFICADO_TIPO_CLAVE_INVALIDO => 'Tipo de clave inválido',
+            self::CERTIFICADO_TAMAÑO_CLAVE_INSUFICIENTE => 'Tamaño de clave insuficiente',
+            self::CERTIFICADO_CLAVE_PUBLICA_INVALIDA => 'Clave pública inválida',
+            self::CERTIFICADO_ERROR_FIRMAR => 'Error al firmar certificado',
+            self::CERTIFICADO_ERROR_VERIFICAR => 'Error al verificar certificado',
         };
     }
 
@@ -242,6 +313,7 @@ enum CodigosError: int
             3 => 'archivo',
             4 => 'autenticacion',
             5 => 'soap',
+            7 => 'certificado',
             default => 'servicio_web',
         };
     }
